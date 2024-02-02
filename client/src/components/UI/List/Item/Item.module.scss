@@ -1,0 +1,17 @@
+@import "src/styles/variables.module";
+
+.item {
+  display: flex;
+  align-content: center;
+  padding: 1em;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $bright-grey;
+  }
+
+  &:has(div) p {
+    margin-left: 1em;
+  }
+
+}

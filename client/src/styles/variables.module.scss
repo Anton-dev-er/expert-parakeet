@@ -1,0 +1,20 @@
+$bright-grey: #F8F8F8;
+$grey: #959595;
+$dark-grey: #5C5C5C;
+
+$bright-red: #F24391;
+$red: #F01879;
+$dark-red: #C0005C;
+
+$black: #272727;
+$white: white;
+
+:export {
+  grey: $grey;
+  bright-grey: $bright-grey;
+  red: $red;
+  black: $black;
+  white: $white;
+}
+
+//@import "@/styles/variables.module";

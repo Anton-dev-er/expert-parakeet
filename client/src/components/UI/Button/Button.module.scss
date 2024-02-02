@@ -1,0 +1,27 @@
+@import "src/styles/variables.module";
+
+.button {
+  background-color: $red;
+  color: $white;
+  padding: .8em 1.6em;
+  font-size: .8em;
+  cursor: pointer;
+  border-radius: 3em;
+  outline: none;
+  border: none;
+  font-weight: 500;
+
+  &:hover {
+    background-color: $dark-red;
+  }
+
+  &.transparent {
+    background-color: transparent;
+    border: .2em solid $white;
+  }
+
+  &.outlined {
+    background-color: $white;
+    color: $red;
+  }
+}

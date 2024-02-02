@@ -1,0 +1,29 @@
+@import "src/styles/variables.module";
+
+.sidebar {
+  position: relative;
+  .sidebarWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    width: 100%;
+    position: sticky;
+    left: 0;
+    top: 0;
+    background-color: $white;
+    padding: 1em;
+
+  }
+}
+
+.logo {
+  display: flex;
+  align-content: center;
+  img {
+    height: 3em;
+    width: 3em;
+    margin-bottom: 3em;
+    margin-left: 1em;
+  }
+}

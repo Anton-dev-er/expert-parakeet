@@ -1,0 +1,62 @@
+@import "@/src/styles/variables.module";
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(149, 149, 149, .2);
+}
+
+.modal-content {
+  position: relative;
+  background-color: $white;
+  margin: auto;
+  width: 80%;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+  min-height: 10em;
+  z-index: 2;
+  opacity: 1;
+  box-shadow: -1px 1px 4px 0px rgb(204 203 203 / 75%);
+  border-radius: 1em;
+}
+
+
+.modal-header {
+  padding: 1em;
+}
+
+.modal-body {
+  padding: 1em;
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+.close {
+  color: $grey;
+  float: right;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
