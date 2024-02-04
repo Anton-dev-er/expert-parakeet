@@ -1,13 +1,13 @@
 const ACTIONS = {
-  JOIN: "join",
-  LEAVE: "leave",
-  SHARE_ROOMS: "share-rooms",
-  ADD_PEER: "add-peer",
-  REMOVE_PEER: "remove-peer",
-  RELAY_SDP: "relay-sdp",
-  RELAY_ICE: "relay-ice",
-  SESSION_DESCRIPTION: "session-description",
-  ICE_CANDIDATE: "ice-candidate",
+  JOIN: "JOIN",
+  LEAVE: "LEAVE",
+  SHARE_ROOMS: "SHARE_ROOMS",
+  ADD_PEER: "ADD_PEER",
+  REMOVE_PEER: "REMOVE_PEER",
+  RELAY_SDP: "RELAY_SDP",
+  RELAY_ICE: "RELAY_ICE",
+  SESSION_DESCRIPTION: "SESSION_DESCRIPTION",
+  ICE_CANDIDATE: "ICE_CANDIDATE",
 };
 
 export default ACTIONS;

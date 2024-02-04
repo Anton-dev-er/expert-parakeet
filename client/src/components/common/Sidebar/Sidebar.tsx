@@ -12,11 +12,11 @@ const list = [
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faHome} />,
   },
   {
-    content: "My Friends",
+    content: "Friends",
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faUserGroup} />,
   },
   {
-    content: "My Rooms",
+    content: "Rooms",
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faFilm} />,
   },
 ];

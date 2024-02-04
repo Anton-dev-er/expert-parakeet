@@ -1,6 +1,5 @@
 import React, {FC} from 'react';
 import styles from "./Modal.module.scss"
-import Card from "@/src/components/UI/Card/Card";
 
 interface ModalProps {
   children: React.ReactNode;

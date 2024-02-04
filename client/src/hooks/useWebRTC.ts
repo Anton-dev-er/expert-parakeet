@@ -25,52 +25,52 @@ export default function useWebRTC(roomId: string) {
   const peerMediaElements = useRef({ [LOCAL_VIDEO]: null });
 
   useEffect(() => {
-    const handleNewPeer = async ({ createOffer, peerID }) => {
-      if (peerID in peerConnections.current) {
-        return console.warn(`Already connected to peer ${peerID}`);
+    const handleNewPeer = async ({ createOffer, peerId }) => {
+      if (peerId in peerConnections.current) {
+        return console.warn(`Already connected to peer ${peerId}`);
       }
 
-      peerConnections.current[peerID] = new RTCPeerConnection({
+      peerConnections.current[peerId] = new RTCPeerConnection({
         iceServers: freeice(),
       });
 
-      peerConnections.current[peerID].onicecandidate = (event) => {
+      peerConnections.current[peerId].onicecandidate = (event) => {
         if (event.candidate) {
           socket.emit(ACTIONS.RELAY_ICE, {
-            peerID,
+            peerId,
             iceCandidate: event.candidate,
           });
         }
       };
 
       let tracksNumber = 0;
-      peerConnections.current[peerID].ontrack = ({
+      peerConnections.current[peerId].ontrack = ({
         streams: [remoteStream],
       }) => {
         tracksNumber++;
 
         // video and audio
         if (tracksNumber === 2) {
-          addNewClient(peerID, () => {
-            peerMediaElements.current[peerID].srcObject = remoteStream;
+          addNewClient(peerId, () => {
+            peerMediaElements.current[peerId].srcObject = remoteStream;
           });
         }
       };
 
       localMediaStream.current.getTracks().forEach((track) => {
-        peerConnections.current[peerID].addTrack(
+        peerConnections.current[peerId].addTrack(
           track,
           localMediaStream.current,
         );
       });
 
       if (createOffer) {
-        const offer = await peerConnections.current[peerID].createOffer();
+        const offer = await peerConnections.current[peerId].createOffer();
 
-        await peerConnections.current[peerID].setLocalDescription(offer);
+        await peerConnections.current[peerId].setLocalDescription(offer);
 
         socket.emit(ACTIONS.RELAY_SDP, {
-          peerID,
+          peerId,
           sessionDescription: offer,
         });
       }
@@ -81,20 +81,20 @@ export default function useWebRTC(roomId: string) {
 
   useEffect(() => {
     const setRemoteMedia = async ({
-      peerID,
+      peerId,
       sessionDescription: remoteDescription,
     }) => {
-      await peerConnections.current[peerID].setRemoteDescription(
+      await peerConnections.current[peerId].setRemoteDescription(
         new RTCSessionDescription(remoteDescription),
       );
 
       if (remoteDescription.type === "offer") {
-        const answer = await peerConnections.current[peerID].createAnswer();
+        const answer = await peerConnections.current[peerId].createAnswer();
 
-        await peerConnections.current[peerID].setLocalDescription(answer);
+        await peerConnections.current[peerId].setLocalDescription(answer);
 
         socket.emit(ACTIONS.RELAY_SDP, {
-          peerID,
+          peerId,
           sessionDescription: answer,
         });
       }
@@ -104,24 +104,24 @@ export default function useWebRTC(roomId: string) {
   }, []);
 
   useEffect(() => {
-    socket.on(ACTIONS.ICE_CANDIDATE, ({ peerID, iceCandidate }) => {
+    socket.on(ACTIONS.ICE_CANDIDATE, ({ peerId, iceCandidate }) => {
       console.log("iceCandidate:", iceCandidate);
-      peerConnections.current[peerID]?.addIceCandidate(
+      peerConnections.current[peerId]?.addIceCandidate(
         new RTCIceCandidate(iceCandidate),
       );
     });
   }, []);
 
   useEffect(() => {
-    const handleRemovePeer = async ({ peerID }) => {
-      if (peerConnections.current[peerID]) {
-        peerConnections.current[peerID].close();
+    const handleRemovePeer = async ({ peerId }) => {
+      if (peerConnections.current[peerId]) {
+        peerConnections.current[peerId].close();
       }
 
-      delete peerConnections.current[peerID];
-      delete peerMediaElements.current[peerID];
+      delete peerConnections.current[peerId];
+      delete peerMediaElements.current[peerId];
 
-      updateClients((list) => list.filter((c) => c !== peerID));
+      updateClients((list) => list.filter((c) => c !== peerId));
     };
 
     socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
