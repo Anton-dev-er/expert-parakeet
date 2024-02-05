@@ -1,15 +1,13 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 
-// todo add types and refactor
+const useStateWithCallback = (initialState: any) => {
+  const [state, setState] = useState(initialState);
+  const callbackRef = useRef<any>();
 
-const useStateWithCallback = (initalState) => {
-  const [state, setState] = useState(initalState);
-  const callbackRef = useRef();
-
-  const updateState = useCallback((newState, callback) => {
+  const updateState = useCallback((newState: any, callback: () => any) => {
     callbackRef.current = callback;
 
-    setState(prev => typeof newState === 'function' ? newState(prev) : newState)
+    setState((prev: any) => (typeof newState === 'function' ? newState(prev) : newState))
   }, [])
 
   useEffect(() => {

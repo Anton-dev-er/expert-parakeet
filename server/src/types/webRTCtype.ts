@@ -2,7 +2,7 @@ interface ServerToClientEvents {
   SHARE_ROOMS: (args: { rooms: string[] }) => void;
   REMOVE_PEER: (args: { peerId: string }) => void;
   ADD_PEER: (args: { peerId: string, createOffer: boolean }) => void;
-  SESSION_DESCRIPTION: (args: { peerId: string, sessionDescription: string }) => void;
+  SESSION_DESCRIPTION: (args: { peerId: string, sessionDescription: RTCSessionDescriptionInit }) => void;
   ICE_CANDIDATE: (args: { peerId: string, iceCandidate: string }) => void;
 }
 

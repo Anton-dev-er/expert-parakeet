@@ -73,7 +73,8 @@ class WebRTCController {
   }
 
 
-  relaySDP = ({peerId, sessionDescription}: { peerId: string, sessionDescription: string }) => {
+  relaySDP = ({peerId, sessionDescription}: { peerId: string, sessionDescription: RTCSessionDescriptionInit }) => {
+    console.log("sessionDescription:", sessionDescription)
     this.io.to(peerId).emit("SESSION_DESCRIPTION", {peerId: this.socket.id, sessionDescription})
   }
 
