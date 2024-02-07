@@ -1,17 +1,18 @@
 import {Server, Socket} from "socket.io";
-import {ClientToServerEvents, IO, ServerToClientEvents} from "../types/webRTCtype.ts";
+import {IO} from "../types/webRTC.type";
 import {validate, version} from "uuid";
 
 class WebRTCHelper {
-  private readonly io;
-  private readonly socket;
+  private readonly io: Server<IO>;
+  private readonly socket: Socket<IO>;
 
-  constructor(io: Server<ClientToServerEvents, ServerToClientEvents>, socket: Socket<ClientToServerEvents, ServerToClientEvents>) {
+  constructor(io: Server<IO>, socket: Socket<IO>) {
     this.io = io
-    this.socket = io
+    this.socket = socket
   }
 
   getValidClientRooms = (): string[] => {
+    // todo
     const {rooms} = this.io.sockets.adapter
     return Array.from(rooms.keys()).filter(roomId => validate(roomId) && version(roomId) === 4)
   }
@@ -22,9 +23,9 @@ class WebRTCHelper {
 }
 
 class WebRTCController {
-  private readonly io;
-  private readonly socket;
-  private readonly helper;
+  private readonly io: Server<IO>;
+  private readonly socket: Socket<IO>;
+  private readonly helper: WebRTCHelper;
 
   constructor(io: Server<IO>, socket: Socket<IO>) {
     this.io = io

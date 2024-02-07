@@ -1,6 +1,6 @@
 import {Server, Socket} from "socket.io";
-import {ClientToServerEvents, IO, ServerToClientEvents} from "../types/webRTCtype.ts";
-import WebRTCController from "../controllers/webRTCController.ts";
+import {IO} from "../types/webRTC.type";
+import WebRTCController from "../controllers/webRTC.controller";
 
 
 const webRTCHandler = (io: Server<IO>, socket: Socket<IO>) => {

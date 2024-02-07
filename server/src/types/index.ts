@@ -12,10 +12,5 @@ interface UserRequest extends Request {
   user?: User | undefined
 }
 
-interface Error {
-  status: number,
-  message: string
-}
 
-
-export {Error, Role, User, UserRequest}
+export {Role, User, UserRequest}

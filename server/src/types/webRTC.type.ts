@@ -10,7 +10,7 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   JOIN: (arg: { room: string }) => void;
   LEAVE: () => void;
-  RELAY_SDP: (arg: { peerId: string, sessionDescription: string }) => void;
+  RELAY_SDP: (arg: { peerId: string, sessionDescription: RTCSessionDescriptionInit }) => void;
   RELAY_ICE: (arg: { peerId: string, iceCandidate: string }) => void;
 }
 

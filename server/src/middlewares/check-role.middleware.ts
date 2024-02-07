@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {Request, Response} from 'express';
 import {Role, User} from "../types";
-import ApiError from "../errors/ApiError.ts";
+import ApiError from "../errors/api.error";
 
 
 export default function (role: Role) {
