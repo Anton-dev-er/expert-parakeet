@@ -2,6 +2,7 @@ import {Server, Socket} from "socket.io";
 import {IO} from "../types/webRTC.type";
 import {validate, version} from "uuid";
 
+// todo move WebRTCHelper to services
 class WebRTCHelper {
   private readonly io: Server<IO>;
   private readonly socket: Socket<IO>;

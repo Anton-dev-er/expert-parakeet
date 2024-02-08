@@ -53,9 +53,8 @@ class AuthController {
     try {
       const { refreshToken } = req.cookies
       const { userDto } = await authService.refresh(refreshToken)
-
       const tokens = tokenService.generateTokens(userDto)
-      await tokenService.saveToken(userDto.id, tokens.refreshToken)
+      await authService.saveRefreshToken(res, userDto.id, refreshToken)
       return res.json({ ...tokens, user: userDto })
     } catch (e) {
       next(e)

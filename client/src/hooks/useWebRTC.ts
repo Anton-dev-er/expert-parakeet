@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 import useStateWithCallback from './useStateWithCallback'
-import socket from '../lib/socket'
-import ACTIONS from '../lib/socket/actions'
+import socket, { ACTIONS } from '../services/socket'
 // @ts-ignore there no @types for freeice
 import freeice from 'freeice'
 
