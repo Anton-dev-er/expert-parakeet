@@ -13,6 +13,13 @@ class AuthService {
     await tokenService.saveToken(userId, refreshToken)
   }
 
+  async removeRefreshToken(res: Response, refreshToken: string) {
+    res.clearCookie('refreshToken')
+    const { payload } = tokenService.validateRefreshToken(refreshToken)
+    await tokenService.removeToken(payload.id)
+    return payload
+  }
+
   async registration(email: string, password: string) {
     const userLoginRepo = userLoginService.repo
     const user = await userLoginRepo.findOne({ where: { email } })
@@ -21,7 +28,7 @@ class AuthService {
     }
 
     const { userEntity } = await userService.create(email, password)
-    const { userLoginEntity } = await userLoginService.create(email, password)
+    const { userLoginEntity } = await userLoginService.create(email, password, userEntity)
 
     const userDto = new UserDto(userEntity, userLoginEntity)
     const { accessToken, refreshToken } = tokenService.generateTokens(userDto)
@@ -33,18 +40,36 @@ class AuthService {
     const userLoginRepo = userLoginService.repo
     const userRepo = userService.repo
 
-    const userLogin = await userLoginRepo.findOne({ where: { email } })
-    const user = await userRepo.findOne({ where: { id: userLogin.user.id } })
-
-    const isPassEquals = tokenService.comparePassword(userLogin.password, password)
-    if (!userLogin || !isPassEquals) {
+    const userLogin = await userLoginRepo.findOne({ where: { email }, relations: { user: true } })
+    const isPassEquals = tokenService.comparePassword(userLogin?.password, password)
+    if (!userLogin || !userLogin.user || !isPassEquals) {
       throw ApiError.BadRequest('Wrong email or password')
     }
 
+    const user = await userRepo.findOne({ where: { id: userLogin.user.id } })
     const userDto = new UserDto(user, userLogin)
     const { accessToken, refreshToken } = tokenService.generateTokens(userDto)
 
     return { accessToken, refreshToken, user: userDto }
+  }
+
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw ApiError.UnauthorizedError()
+    }
+    const userLoginRepo = userLoginService.repo
+    const userRepo = userService.repo
+
+    const userData = tokenService.validateRefreshToken(refreshToken)
+    const userLogin = await userLoginRepo.findOne({ where: { refreshToken } })
+    if (!userData || !userLogin) {
+      throw ApiError.UnauthorizedError()
+    }
+
+    const user = await userRepo.findOneBy({ id: userData.payload.id })
+    const userDto = new UserDto(user, userLogin)
+
+    return { userDto }
   }
 }
 

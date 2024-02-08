@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+import UserDto from '../dtos/user-dto'
 
 type Role = "Admin" | "User"
 
@@ -9,7 +10,7 @@ interface User {
 }
 
 interface UserRequest extends Request {
-  user?: User | undefined
+  user?: UserDto | undefined
 }
 
 

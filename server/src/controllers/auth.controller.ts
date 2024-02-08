@@ -1,11 +1,12 @@
 import ApiError from '../errors/api.error'
 import { validationResult } from 'express-validator'
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import authService from '../services/auth.service'
+import tokenService from '../services/token.service'
 
 
 class AuthController {
-  async registration(req: Request, res: Response, next: any) {
+  async registration(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -21,7 +22,7 @@ class AuthController {
     }
   }
 
-  async login(req: Request, res: Response, next: any) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -37,6 +38,38 @@ class AuthController {
       next(e)
     }
   }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { refreshToken } = req.cookies
+      const user = await authService.removeRefreshToken(res, refreshToken)
+      return res.json({ user, accessToken: null, refreshToken: null })
+    } catch (e) {
+      next(e)
+    }
+  }
+
+  async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { refreshToken } = req.cookies
+      const { userDto } = await authService.refresh(refreshToken)
+
+      const tokens = tokenService.generateTokens(userDto)
+      await tokenService.saveToken(userDto.id, tokens.refreshToken)
+      return res.json({ ...tokens, user: userDto })
+    } catch (e) {
+      next(e)
+    }
+  }
+
+  health(req: Request, res: Response, next: NextFunction) {
+    try {
+      return res.json({ ok: true })
+    } catch (e) {
+      next(e)
+    }
+  }
+
 }
 
 export default new AuthController()

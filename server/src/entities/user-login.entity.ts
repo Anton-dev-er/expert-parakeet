@@ -12,7 +12,7 @@ export default class UserLoginEntity {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @OneToOne(() => UserEntity)
+    @OneToOne(() => UserEntity, { cascade: true })
     @JoinColumn()
     user: UserEntity
 
@@ -28,7 +28,7 @@ export default class UserLoginEntity {
     @Column({ nullable: false })
     activationLink: string;
 
-    @Column({ nullable: true })
+    @Column({ default: null })
     refreshToken: string;
 
     @CreateDateColumn()

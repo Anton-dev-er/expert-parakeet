@@ -12,7 +12,7 @@ export default function (role: Role) {
     try {
       const token = req.headers.authorization?.split(' ')[1] // Bearer token
       if (!token) {
-        return next(ApiError.notAuthorized())
+        return next(ApiError.UnauthorizedError())
       }
       const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as User
       if (decoded.role !== role) {
@@ -21,7 +21,7 @@ export default function (role: Role) {
       req.user = decoded;
       next()
     } catch (e) {
-      return next(ApiError.notAuthorized())
+      return next(ApiError.UnauthorizedError())
     }
   };
 }

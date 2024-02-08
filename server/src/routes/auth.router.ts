@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import authController from '../controllers/auth.controller'
 import { body } from 'express-validator'
+import authMiddleware from '../middlewares/auth.middleware'
 
 const router = Router()
 router.post('/registration',
@@ -13,7 +14,8 @@ router.post('/login',
   body('password').notEmpty(),
   authController.login,
 )
-// router.post('/logout', authController.logout)
+router.post('/logout', authController.logout)
+router.get('/refresh', authController.refresh)
+router.get('/health', authMiddleware, authController.health)
 // router.get('/activate/:link', authController.activate)
-// router.get('/refresh', authController.refresh)
 export default router

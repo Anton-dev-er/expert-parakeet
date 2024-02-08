@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import ApiError from '../errors/api.error'
-import { User, UserRequest } from '../types'
+import { UserRequest } from '../types'
+import UserDto from '../dtos/user-dto'
 
 export default function(req: UserRequest, res: Response, next: any) {
   if (req.method === 'OPTIONS') {
@@ -13,7 +14,7 @@ export default function(req: UserRequest, res: Response, next: any) {
       return next(ApiError.UnauthorizedError())
     }
 
-    req.user = jwt.verify(token, process.env.SECRET_KEY as string) as User
+    req.user = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as UserDto
     next()
   } catch (e) {
     return next(ApiError.UnauthorizedError())

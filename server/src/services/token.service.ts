@@ -2,12 +2,11 @@ import UserDto from '../dtos/user-dto'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import userLoginService from './user-login.service'
-import userService from './user.service'
 
 class TokenService {
   generateTokens(payload: UserDto) {
-    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '30m' })
-    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' })
+    const accessToken = jwt.sign({ payload }, process.env.JWT_ACCESS_SECRET, { expiresIn: '30m' })
+    const refreshToken = jwt.sign({ payload }, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' })
     return {
       accessToken,
       refreshToken,
@@ -19,6 +18,9 @@ class TokenService {
   }
 
   comparePassword(hashPassword: string, password: string) {
+    if (!hashPassword || !password) {
+      return false
+    }
     return bcrypt.compareSync(password, hashPassword)
   }
 
@@ -30,9 +32,9 @@ class TokenService {
     }
   }
 
-  validateRefreshToken(token) {
+  validateRefreshToken(token: string): null | { payload: UserDto } {
     try {
-      return jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+      return jwt.verify(token, process.env.JWT_REFRESH_SECRET) as { payload: UserDto }
     } catch (e) {
       return null
     }
@@ -40,12 +42,15 @@ class TokenService {
 
   async saveToken(userId: string, refreshToken: string) {
     const userLoginRepo = userLoginService.repo
-    const userRepo = userService.repo
-
-    const user = await userRepo.findOne({ where: { id: userId } })
-    const userLogin = await userLoginRepo.findOne({ where: { user: user } })
-
+    const userLogin = await userLoginRepo.findOne({ where: { user: { id: userId } } })
     userLogin.refreshToken = refreshToken
+    await userLoginRepo.save(userLogin)
+  }
+
+  async removeToken(userId: string) {
+    const userLoginRepo = userLoginService.repo
+    const userLogin = await userLoginRepo.findOne({ where: { user: { id: userId } } })
+    userLogin.refreshToken = null
     await userLoginRepo.save(userLogin)
   }
 
