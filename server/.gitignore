@@ -1,0 +1,10 @@
+### Server dependencies
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+.env/
+.env
+package-lock.json/
