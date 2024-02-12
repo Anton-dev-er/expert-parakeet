@@ -1,22 +1,32 @@
-import jwt from 'jsonwebtoken'
-import { Response } from 'express'
-import ApiError from '../errors/api.error'
-import { UserRequest } from '../types'
-import UserDto from '../dtos/user-dto'
+import { Response } from "express";
+import ApiError from "../errors/api.error";
+import { UserRequest } from "../types";
+import tokenService from "../services/token.service";
 
-export default function(req: UserRequest, res: Response, next: any) {
-  if (req.method === 'OPTIONS') {
-    next()
+export default function (req: UserRequest, res: Response, next: any) {
+  if (req.method === "OPTIONS") {
+    next();
   }
   try {
-    const token = req.headers.authorization?.split(' ')[1] // Bearer token
+    const authorizationHeader = req.headers.authorization;
+
+    const token = authorizationHeader?.split(" ")[1]; // Bearer token
     if (!token) {
-      return next(ApiError.UnauthorizedError("Unauthorized error, token not valid"))
+      return next(
+        ApiError.UnauthorizedError("Unauthorized error, token not valid"),
+      );
     }
 
-    req.user = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string) as UserDto
-    next()
+    const user = tokenService.validateAccessToken(token);
+    if (!user) {
+      return next(
+        ApiError.UnauthorizedError("Unauthorized error, verify error"),
+      );
+    }
+
+    req.user = user;
+    next();
   } catch (e) {
-    return next(ApiError.UnauthorizedError())
+    return next(ApiError.UnauthorizedError("Not Authorized"));
   }
-};
+}

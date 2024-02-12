@@ -24,4 +24,9 @@
     background-color: $white;
     color: $red;
   }
+
+  &:disabled {
+    cursor: default;
+    background-color: $grey;
+  }
 }

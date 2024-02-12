@@ -1,38 +1,38 @@
-"use client"
+'use client'
 
-import React from "react";
-import styles from "./Sidebar.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilm, faHome, faUserGroup } from "@fortawesome/free-solid-svg-icons";
-import List from "@/src/components/UI/List/List";
-import Image from "next/image";
-import Logo from "@/public/logo-2.png";
+import React from 'react'
+import styles from './Sidebar.module.scss'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFilm, faHome, faUserGroup } from '@fortawesome/free-solid-svg-icons'
+import List from '@/src/components/UI/List/List'
+import Image from 'next/image'
+import Logo from '@/public/logo-2.png'
 import Button from '@/src/components/UI/Button/Button'
 import useAuthContext from '@/src/hooks/useAuthContext'
 
 const list = [
   {
-    content: "Home",
+    content: 'Home',
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faHome} />,
   },
   {
-    content: "Friends",
+    content: 'Friends',
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faUserGroup} />,
   },
   {
-    content: "Rooms",
+    content: 'Rooms',
     ImageComponent: <FontAwesomeIcon fixedWidth={true} icon={faFilm} />,
   },
-];
+]
 
-const list2 = [
-  { content: "Account" },
-  { content: "Settings" },
-  { content: "History" },
-];
+const list2 = [{ content: 'Account' }, { content: 'Settings' }, { content: 'History' }]
 
 const Sidebar = () => {
-  const { logout } = useAuthContext()
+  const { logout, auth } = useAuthContext()
+
+  const handleLogout = async () => {
+    await logout()
+  }
 
   return (
     <div className={styles.sidebar}>
@@ -46,16 +46,12 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <Button
-          onClick={async () => {
-            await logout()
-          }}
-        >
+        <Button disabled={!auth} onClick={handleLogout}>
           Log Out
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

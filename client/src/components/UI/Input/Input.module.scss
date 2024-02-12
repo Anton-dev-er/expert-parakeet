@@ -1,0 +1,50 @@
+@import "@/src/styles/variables.module";
+
+.input {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 1em;
+  position: relative;
+
+
+  label {
+    color: $black;
+    position: absolute;
+    cursor: auto;
+    transition: transform 100ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+    transform: translate(0px) scale(1);
+
+  }
+
+  &.focus label {
+    left: 1px;
+    cursor: auto;
+    transform: translate(-10px, -14px) scale(0.75);
+  }
+
+  input {
+    border: none;
+    outline: none;
+    border-bottom: 0.1em solid $bright-red;
+    color: $black;
+    padding-bottom: 0.2em;
+
+    &::placeholder {
+      color: $grey
+    }
+
+    &:focus {
+      border: none;
+      outline: none;
+      border-bottom: 0.1em solid $bright-red;
+    }
+  }
+
+  p {
+    font-size: 12px;
+    color: $error;
+    font-weight: 500;
+    margin: 0.4em 0;
+  }
+}

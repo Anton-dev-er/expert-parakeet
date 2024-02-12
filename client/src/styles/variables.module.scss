@@ -9,12 +9,17 @@ $dark-red: #C0005C;
 $black: #272727;
 $white: white;
 
+$error: red;
+
 :export {
   grey: $grey;
+  dark-grey: $dark-grey;
   bright-grey: $bright-grey;
   red: $red;
+  dark-red: $dark-red;
   black: $black;
   white: $white;
+  error: $error;
 }
 
 //@import "@/styles/variables.module";

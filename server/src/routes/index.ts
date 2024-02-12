@@ -1,7 +1,9 @@
-import authRouter from "./auth.router";
 import Router from "express";
+import authRouter from "./auth.router";
+import roomRouter from "./room.router";
 
-const router = Router()
-router.use('/auth', authRouter)
+const router = Router();
+router.use("/auth", authRouter);
+router.use("/rooms", roomRouter);
 
-export default router
+export default router;

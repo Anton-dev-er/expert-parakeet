@@ -1,3 +1,6 @@
+import AuthService from '@/src/services/AuthService'
+import { sleep } from '@/src/utils'
+
 class Http {
   private readonly baseUrl: string
   private readonly useAccessToken: boolean
@@ -29,7 +32,16 @@ class Http {
       init.credentials = 'include'
     }
 
-    return await fetch(input, init)
+    const response = await fetch(input, init)
+
+    if (response.status === 401) {
+      const tokens = await AuthService.refresh()
+      console.log('refresh tokens:', tokens)
+      localStorage.setItem('token', tokens.accessToken)
+      await this.fetch(input, init)
+    }
+
+    return response
   }
 
   async get(url: string, headers?: any) {

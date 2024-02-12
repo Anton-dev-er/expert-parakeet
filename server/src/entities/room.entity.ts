@@ -6,15 +6,18 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from "typeorm";
-import UserRoleEntity from "./user-role.entity";
+import UserRoomEntity from "./user-room.entity";
 
-@Entity({ name: "role" })
-export default class RoleEntity {
+@Entity({ name: "room" })
+export default class RoomEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ nullable: false })
-  title: string;
+  name: string;
+
+  @Column({ default: false })
+  is_private: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

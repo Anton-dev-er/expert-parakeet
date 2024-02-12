@@ -19,6 +19,7 @@ export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) =
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
+      // todo not good
       void refresh()
     }
   }, [])
