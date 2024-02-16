@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import useStateWithCallback from './useStateWithCallback'
-import socket, { ACTIONS } from '../services/socket'
 // @ts-ignore there no @types for freeice
 import freeice from 'freeice'
+import { ACTIONS } from '@/src/contexts/SocketContext'
+import { DefaultEventsMap } from '@socket.io/component-emitter'
+import { Socket } from 'socket.io-client'
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
@@ -14,7 +16,10 @@ type PeerConnections = {
   [key: string]: RTCPeerConnection | null
 }
 
-export default function useWebRTC(roomId: string) {
+export default function useWebRTC(
+  roomName: string,
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
+) {
   const [clients, updateClients] = useStateWithCallback([])
 
   const addNewClient = useCallback(
@@ -30,7 +35,13 @@ export default function useWebRTC(roomId: string) {
   const localMediaStream = useRef<MediaStream | null>(null)
   const peerMediaElements = useRef<PeerMediaElements>({})
 
-  const handleNewPeer = async ({ createOffer, peerId }: { peerId: string; createOffer: boolean }) => {
+  const handleNewPeer = async ({
+    createOffer,
+    peerId,
+  }: {
+    peerId: string
+    createOffer: boolean
+  }) => {
     if (peerId in peerConnections.current) {
       return console.warn(`Already connected to peer ${peerId}`)
     }
@@ -41,7 +52,7 @@ export default function useWebRTC(roomId: string) {
     peerConnection.onicecandidate = (event) => {
       const iceCandidate = event.candidate
       if (iceCandidate) {
-        socket.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate })
+        socket?.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate })
       }
     }
 
@@ -69,7 +80,7 @@ export default function useWebRTC(roomId: string) {
 
       await peerConnection.setLocalDescription(offer)
 
-      socket.emit(ACTIONS.RELAY_SDP, {
+      socket?.emit(ACTIONS.RELAY_SDP, {
         peerId,
         sessionDescription: offer,
       })
@@ -92,7 +103,7 @@ export default function useWebRTC(roomId: string) {
 
         await peerConnection.setLocalDescription(answer)
 
-        socket.emit(ACTIONS.RELAY_SDP, { peerId, sessionDescription: answer })
+        socket?.emit(ACTIONS.RELAY_SDP, { peerId, sessionDescription: answer })
       }
     } else {
       console.warn('Peer connection is null')
@@ -110,14 +121,16 @@ export default function useWebRTC(roomId: string) {
   }
 
   useEffect(() => {
-    socket.on(ACTIONS.ADD_PEER, handleNewPeer)
-    socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer)
-    socket.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia)
-    socket.on(ACTIONS.ICE_CANDIDATE, ({ peerId, iceCandidate }) => {
-      console.log('iceCandidate:', iceCandidate)
-      const peerConnection = peerConnections.current[peerId]
-      void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate))
-    })
+    socket?.on(ACTIONS.ADD_PEER, handleNewPeer)
+    socket?.on(ACTIONS.REMOVE_PEER, handleRemovePeer)
+    socket?.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia)
+    socket?.on(
+      ACTIONS.ICE_CANDIDATE,
+      ({ peerId, iceCandidate }: { peerId: string; iceCandidate: any }) => {
+        const peerConnection = peerConnections.current[peerId]
+        void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate))
+      }
+    )
   }, [])
 
   useEffect(() => {
@@ -137,7 +150,7 @@ export default function useWebRTC(roomId: string) {
     }
 
     startCapture()
-      .then(() => socket.emit(ACTIONS.JOIN, { room: roomId }))
+      .then(() => socket?.emit(ACTIONS.JOIN, { room: roomName }))
       .catch(() => console.error('Error getting userMedia'))
 
     return () => {
@@ -145,12 +158,12 @@ export default function useWebRTC(roomId: string) {
         localMediaStream.current.getTracks().forEach((track) => {
           track.stop()
         })
-        socket.emit(ACTIONS.LEAVE)
+        socket?.emit(ACTIONS.LEAVE)
       } else {
         console.warn('LocalMediaStream.current empty')
       }
     }
-  }, [roomId])
+  }, [roomName])
 
   const provideMediaRef = useCallback((id: string, node: HTMLMediaElement) => {
     peerMediaElements.current[id] = node

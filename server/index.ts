@@ -24,12 +24,7 @@ const io = new Server<IO>(server, {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    credentials: true,
-    origin: process.env.CLIENT_URL,
-  }),
-);
+app.use(cors());
 app.use("/api", router);
 
 // Error handler should be last

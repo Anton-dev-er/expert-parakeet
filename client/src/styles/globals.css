@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 
-ul, li, p, h1, h2, button {
+ul, li, p, h1, h2, h3, button {
     margin: 0;
     padding: 0;
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import UserDto from "../dtos/user-dto";
+import UserDto from "../dtos/user.dto";
 import { JwtPayload } from "jsonwebtoken";
 
 type Role = "Admin" | "User";

@@ -2,36 +2,41 @@
 import React, { useEffect, useState } from 'react'
 import Modal from '@/src/components/UI/Modal/Modal'
 import Button from '@/src/components/UI/Button/Button'
-import { useRouter } from 'next/navigation'
-import socket, { ACTIONS } from '@/src/services/socket'
-import { Item } from '@/src/components/UI/List/types'
+import RoomService from '@/src/services/RoomService'
+import useAuthContext from '@/src/hooks/useAuthContext'
 import List from '@/src/components/UI/List/List'
-import item from '@/src/components/UI/List/Item/Item'
+import { Item } from '@/src/components/UI/List/types'
+import { useRouter } from 'next/navigation'
+import { roomHref } from '@/src/utils/room.utils'
+import { RoomResponse } from '@/src/types/response/RoomResponse'
 
 const JoinRoomModal = () => {
   const [open, setOpen] = useState(false)
-  const [rooms, updateRooms] = useState([])
-  const [listItems, setListItems] = useState<Item[]>([])
+  const [userPublicRooms, setUserPublicRooms] = useState<Item[]>([])
+  const [userPrivateRooms, setUserPrivateRooms] = useState<Item[]>([])
+  const { auth, user } = useAuthContext()
   const { push } = useRouter()
 
-  useEffect(() => {
-    socket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] }) => {
-      updateRooms(rooms)
-    })
-  }, [])
+  const getFilteredRoomList = (rooms: RoomResponse[], isPrivate = false) => {
+    return rooms
+      .filter((room) => room.isPrivate === isPrivate)
+      .map((room) => {
+        return {
+          content: room.name,
+          id: room.id,
+          handleOnClick: () => push(roomHref(room.id)),
+        }
+      })
+  }
 
   useEffect(() => {
-    const items: Item[] = rooms.map((roomId): Item => {
-      return {
-        content: `Click to join to this room: ${roomId}`,
-        id: roomId,
-        handleOnClick: () => {
-          push(`/room/${roomId}`)
-        },
-      }
-    })
-    setListItems(items)
-  }, [rooms])
+    if (auth && user) {
+      RoomService.getUserRooms(user.id).then((rooms) => {
+        setUserPublicRooms(getFilteredRoomList(rooms, false))
+        setUserPrivateRooms(getFilteredRoomList(rooms, true))
+      })
+    }
+  }, [user])
 
   const handleOnOpen = () => {
     setOpen(true)
@@ -44,10 +49,24 @@ const JoinRoomModal = () => {
   return (
     <>
       <Button type="outlined" onClick={handleOnOpen}>
-        Join Room
+        My rooms
       </Button>
-      <Modal open={open} handleOnClose={handleOnClose} header="Join Room">
-        {listItems.length ? <List items={listItems} /> : <h3>Rooms not found</h3>}
+      <Modal open={open} handleOnClose={handleOnClose} header="My rooms">
+        {!!userPublicRooms.length && (
+          <>
+            <h3>Public Rooms</h3>
+            <List items={userPublicRooms} />
+          </>
+        )}
+
+        {!!userPrivateRooms.length && (
+          <>
+            <h3>Private Rooms</h3>
+            <List items={userPrivateRooms} />
+          </>
+        )}
+
+        {!userPublicRooms.length && !userPrivateRooms.length && <h3>Rooms not found</h3>}
       </Modal>
     </>
   )

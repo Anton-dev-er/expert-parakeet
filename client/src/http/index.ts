@@ -1,5 +1,4 @@
 import AuthService from '@/src/services/AuthService'
-import { sleep } from '@/src/utils'
 
 class Http {
   private readonly baseUrl: string
@@ -10,7 +9,10 @@ class Http {
     this.useAccessToken = useAccessToken
   }
 
-  private async fetch(input: string | URL | globalThis.Request, init?: RequestInit) {
+  private async fetch(
+    input: string | URL | globalThis.Request,
+    init?: RequestInit
+  ): Promise<Response> {
     // todo refactor
     if (!init) {
       init = {}
@@ -38,14 +40,14 @@ class Http {
       const tokens = await AuthService.refresh()
       console.log('refresh tokens:', tokens)
       localStorage.setItem('token', tokens.accessToken)
-      await this.fetch(input, init)
+      return await this.fetch(input, init)
     }
 
     return response
   }
 
-  async get(url: string, headers?: any) {
-    const response = await this.fetch(`${this.baseUrl}${url}`, {
+  async get(url: string, params?: any, headers?: any) {
+    const response = await this.fetch(`${this.baseUrl}${url}?` + new URLSearchParams(params), {
       method: 'GET',
       headers,
     })

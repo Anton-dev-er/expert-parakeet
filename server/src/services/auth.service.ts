@@ -3,7 +3,7 @@ import { Response } from "express";
 import tokenService from "./token.service";
 import ApiError from "../errors/api.error";
 import userLoginService from "./user-login.service";
-import UserDto from "../dtos/user-dto";
+import UserDto from "../dtos/user.dto";
 
 // todo good to refactor, some methods to emphasize in user service
 class AuthService {

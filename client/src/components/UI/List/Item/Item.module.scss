@@ -6,6 +6,10 @@
   padding: 1em;
   cursor: pointer;
 
+  p {
+    white-space: pre-line;
+  };
+
   &:hover {
     background-color: $bright-grey;
   }

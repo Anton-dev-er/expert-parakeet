@@ -2,24 +2,28 @@ import { NextFunction, Request, Response } from "express";
 import roomService from "../services/room.service";
 import userService from "../services/user.service";
 import userRoomService from "../services/user-room.service";
-import RoomDto from "../dtos/room-dto";
+import RoomDto from "../dtos/room.dto";
 
 class RoomController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { roomName, roomPrivacy } = req.body;
+      const { roomName, roomRoute, isPrivate, isOwner } = req.body;
       const { userId } = req.params;
-      const roomEntity = await roomService.create(roomName, roomPrivacy);
+      const roomEntity = await roomService.create(
+        roomName,
+        roomRoute,
+        isPrivate,
+      );
       const userEntity = await userService.getById(userId);
       const userRoomEntity = await userRoomService.create(
         userEntity,
         roomEntity,
-        roomPrivacy,
+        isOwner,
       );
 
-      const roomDto = new RoomDto(roomEntity, userRoomEntity);
+      const roomDto = new RoomDto(userRoomEntity);
 
-      return res.json({ room: roomDto });
+      return res.json(roomDto);
     } catch (e) {
       next(e);
     }
@@ -28,19 +32,31 @@ class RoomController {
   async getRooms(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
-      const userRooms = await userRoomService.getUserRooms(userId);
+      const userRooms = await userRoomService.getAllUserRoomsByUserId(userId);
 
       const roomsDto: RoomDto[] = userRooms.map((userRoom) => {
-        return new RoomDto(userRoom.room, userRoom);
+        return new RoomDto(userRoom);
       });
 
-      return res.json({ rooms: roomsDto });
+      return res.json(roomsDto);
     } catch (e) {
       next(e);
     }
   }
 
-  getAll(req: Request, res: Response, next: NextFunction) {}
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userRooms = await userRoomService.getAllUserRooms();
+
+      const roomsDto: RoomDto[] = userRooms.map((userRoom) => {
+        return new RoomDto(userRoom);
+      });
+
+      return res.json(roomsDto);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new RoomController();

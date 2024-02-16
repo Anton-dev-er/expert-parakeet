@@ -16,6 +16,9 @@ export default class RoomEntity {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: false })
+  route: string;
+
   @Column({ default: false })
   is_private: boolean;
 

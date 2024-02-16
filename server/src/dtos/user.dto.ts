@@ -1,5 +1,5 @@
-import UserEntity from '../entities/user.entity'
-import UserLoginEntity from '../entities/user-login.entity'
+import UserEntity from "../entities/user.entity";
+import UserLoginEntity from "../entities/user-login.entity";
 
 export default class UserDto {
   id: string;

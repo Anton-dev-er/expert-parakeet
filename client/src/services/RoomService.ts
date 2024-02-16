@@ -12,8 +12,10 @@ export default class RoomService {
   static async createRoom(
     userId: string,
     roomName: string,
-    roomPrivacy: boolean
+    roomRoute: string,
+    isPrivate: boolean,
+    isOwner: boolean
   ): Promise<RoomResponse> {
-    return this.api.post(`/${userId}`, { roomName, roomPrivacy })
+    return this.api.post(`/${userId}`, { roomName, roomRoute, isPrivate, isOwner })
   }
 }

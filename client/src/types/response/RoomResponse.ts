@@ -1,8 +1,11 @@
-import { User } from '@/src/types'
-
 export interface RoomResponse {
   id: string
   name: string
-  isOwner: boolean
+  route: string
+  user: {
+    id: string
+    name: string
+    isOwner: boolean
+  }
   isPrivate: boolean
 }

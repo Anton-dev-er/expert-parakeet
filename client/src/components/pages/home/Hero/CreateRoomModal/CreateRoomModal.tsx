@@ -8,6 +8,7 @@ import { v4 } from 'uuid'
 import useAuthContext from '@/src/hooks/useAuthContext'
 import { isValidRoomName } from '@/src/utils'
 import RoomService from '@/src/services/RoomService'
+import { roomHref } from '@/src/utils/room.utils'
 
 const CreateRoomModal = () => {
   const [open, setOpen] = useState(false)
@@ -28,17 +29,13 @@ const CreateRoomModal = () => {
   }
 
   const handleCreateRoom = async () => {
-    // make request for create room
     if (!roomName || !auth || !user) {
-      return push(`/room/${v4()}`)
+      return push(roomHref(v4()))
     }
-
-    const room = await RoomService.createRoom(user.id, roomName, false)
-
-    console.log('room:', room)
-
+    const roomRoute = formatRoomName(roomName)
+    const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true)
     if (room) {
-      push(`/room/${formatRoomName(room.name)}`)
+      push(roomHref(room.id))
     }
   }
 
@@ -58,7 +55,7 @@ const CreateRoomModal = () => {
             message: auth ? 'Room name not valid' : 'Log in to create custom room name',
           }}
         />
-        <Button onClick={handleCreateRoom}>Join Room</Button>
+        <Button onClick={handleCreateRoom}>Create Room</Button>
       </Modal>
     </>
   )

@@ -8,6 +8,7 @@ import '@/src/styles/normalize.css'
 import '@/src/styles/globals.css'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { AuthContext, AuthContextProvider } from '@/src/contexts/AuthContext'
+import { SocketContextProvider } from '@/src/contexts/SocketContext'
 
 config.autoAddCss = false
 const inter = Inter({ subsets: ['latin'] })
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} ${styles.body}`}>
-        <AuthContextProvider>{children}</AuthContextProvider>
+        <AuthContextProvider>
+          <SocketContextProvider>{children}</SocketContextProvider>
+        </AuthContextProvider>
       </body>
     </html>
   )

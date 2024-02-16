@@ -7,6 +7,12 @@ class UserRoomService {
   readonly repo = AppDataSource.getRepository(UserRoomEntity);
 
   async create(user: UserEntity, room: RoomEntity, isOwner: boolean) {
+    const userRoom = await this.getUserRoomByRoomIdAndUserId(room.id, user.id);
+    if (userRoom) {
+      console.log("userRoom already exists:", room.name, user.name);
+      return userRoom;
+    }
+
     const userRoomEntity = new UserRoomEntity();
     userRoomEntity.user = user;
     userRoomEntity.room = room;
@@ -16,13 +22,30 @@ class UserRoomService {
     return userRoomEntity;
   }
 
-  async getUserRooms(userId: string): Promise<UserRoomEntity[]> {
-    const userRooms = await this.repo.find({
-      where: { user: { id: userId } },
-      relations: { user: true },
-    });
+  async getUserRoomByRoomIdAndUserId(roomId: string, userId: string) {
+    return this.repo.findOneBy({ room: { id: roomId }, user: { id: userId } });
+  }
 
-    return userRooms;
+  async getAllUserRoomsByUserId(userId: string) {
+    return await this.repo.find({
+      where: { user: { id: userId } },
+      relations: { room: true, user: true },
+    });
+  }
+
+  async getUserRoomByUserRoomId(userRoomId: string) {
+    return await this.repo.findOne({
+      where: { id: userRoomId },
+      relations: { room: true, user: true },
+    });
+  }
+
+  async getAllUserRooms() {
+    // only public
+    return await this.repo.find({
+      where: { room: { is_private: false } },
+      relations: { room: true, user: true },
+    });
   }
 }
 
