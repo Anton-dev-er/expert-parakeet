@@ -1,7 +1,6 @@
-import RoomDto from "../dtos/room-dto";
 
 interface ServerToClientEvents {
-  SHARE_ROOMS: (args: { rooms: RoomDto[] }) => void;
+  SHARE_ROOMS: (args: { rooms: string[] }) => void;
   REMOVE_PEER: (args: { peerId: string }) => void;
   ADD_PEER: (args: { peerId: string; createOffer: boolean }) => void;
   SESSION_DESCRIPTION: (args: {

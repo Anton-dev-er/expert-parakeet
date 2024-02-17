@@ -4,10 +4,10 @@ import cookieParser from "cookie-parser";
 import router from "./src/routes/index";
 import errorHandler from "./src/middlewares/error-handling.middleware";
 import onConnection from "./src/sockets";
-import { Server } from "socket.io";
-import { IO } from "./src/types/webRTC.type";
+import {Server} from "socket.io";
+import {IO} from "./src/types/webRTC.type";
 import dotenv from "dotenv";
-import { AppDataSource } from "./src/data-source";
+import {AppDataSource} from "./src/data-source";
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ const io = new Server<IO>(server, {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({credentials: true, origin: process.env.CLIENT_URL}));
 app.use("/api", router);
 
 // Error handler should be last

@@ -1,5 +1,5 @@
-import { Server, Socket } from "socket.io";
-import { IO } from "../types/webRTC.type";
+import {Server, Socket} from "socket.io";
+import {IO} from "../types/webRTC.type";
 import userRoomService from "../services/user-room.service";
 import RoomDto from "../dtos/room.dto";
 
@@ -13,19 +13,17 @@ class WebRTCHelper {
     this.socket = socket;
   }
 
-  getValidClientRooms = async (): Promise<RoomDto[]> => {
-    const fetchedRooms = (await this.io.fetchSockets()) || [];
-    const ids = fetchedRooms.map((room) => room.id);
-    console.log("\nfetchSockets rooms:", ids);
-    console.log("this.io.of.adapter.rooms:", this.io.of("/").adapter.rooms);
+  getValidClientRooms = async (): Promise<string[]> => {
+    const fetchedSockets = (await this.io.fetchSockets()) || [];
 
-    const roomNames: RoomDto[] = [];
-    fetchedRooms.forEach((fetchedRoom) => {
-      const data = fetchedRoom.data as RoomDto | null;
-      const roomName = data?.name;
-      if (roomName) {
-        roomNames.push(data);
-      }
+    const roomNames: string[] = [];
+    fetchedSockets.forEach((socket) => {
+      const rooms = socket.rooms
+      rooms.forEach((room) => {
+        if (room !== socket.id) {
+          roomNames.push(room);
+        }
+      })
     });
     return roomNames;
   };
@@ -48,37 +46,41 @@ class WebRTCController {
   }
 
   async shareRoomsInfo() {
-    const rooms: RoomDto[] = await this.helper.getValidClientRooms();
-    this.io.emit("SHARE_ROOMS", { rooms });
+    const rooms: string[] = await this.helper.getValidClientRooms();
+    this.io.emit("SHARE_ROOMS", {rooms});
   }
 
-  joinRoom = async ({ room: userRoomId }: { room: string }) => {
+  joinRoom = async ({room: userRoomId}: { room: string }) => {
+    console.log("join room:", )
     if (!this.socket) {
       console.log("joinRoom, this socket empty, roomId:", userRoomId);
       return;
     }
-    console.log("\nJoining room, socketId:", this.socket.id);
-    const { rooms } = this.socket;
 
-    const userRoom = await userRoomService.getUserRoomByUserRoomId(userRoomId);
-    this.socket.data = new RoomDto(userRoom);
-
-    if (Array.from(rooms).includes(userRoomId)) {
-      return console.warn("Already joined to this room");
+    const userRoom = userRoomService.getUserRoomByUserRoomId(userRoomId)
+    console.log("userRoomId:", userRoomId)
+    if (!userRoom) {
+      console.log("room doesnt not exists:", userRoomId);
+      return;
     }
 
+    const {rooms} = this.socket;
+    if (Array.from(rooms).includes(userRoomId)) {
+      console.warn("Already joined to this room");
+      return
+    }
+
+
     const clients = this.helper.getClientsByRoomId(userRoomId);
-    console.log(`clients for ${userRoomId}:`, clients);
 
     clients.forEach((clientId) => {
       this.socket
-        .to(clientId)
-        .emit("ADD_PEER", { peerId: this.socket.id, createOffer: false });
+          .to(clientId)
+          .emit("ADD_PEER", {peerId: this.socket.id, createOffer: false});
 
-      this.socket.emit("ADD_PEER", { peerId: clientId, createOffer: true });
+      this.socket.emit("ADD_PEER", {peerId: clientId, createOffer: true});
     });
     this.socket.join(userRoomId);
-    console.log("room joined socket, userRoomId:", userRoomId, "\n");
     this.shareRoomsInfo();
   };
 
@@ -88,32 +90,23 @@ class WebRTCController {
       return;
     }
 
-    console.log("\nRoom leaving socket, socketId:", this.socket.id);
-
-    const { rooms } = this.socket;
+    const {rooms} = this.socket;
 
     Array.from(rooms || []).forEach((roomId: string) => {
       const clients = this.helper.getClientsByRoomId(roomId);
 
-      console.log("roomId:", roomId);
-      console.log("clients:", clients);
-
       clients.forEach((clientID) => {
-        this.io.to(clientID).emit("REMOVE_PEER", { peerId: this.socket.id });
-        this.socket.emit("REMOVE_PEER", { peerId: clientID });
+        this.io.to(clientID).emit("REMOVE_PEER", {peerId: this.socket.id});
+        this.socket.emit("REMOVE_PEER", {peerId: clientID});
       });
 
       this.socket.leave(roomId);
-      console.log("room left socket, roomId:", roomId, "\n");
     });
 
     this.shareRoomsInfo();
   };
 
-  relaySDP = ({
-    peerId,
-    sessionDescription,
-  }: {
+  relaySDP = ({peerId, sessionDescription}: {
     peerId: string;
     sessionDescription: RTCSessionDescriptionInit;
   }) => {
@@ -123,16 +116,13 @@ class WebRTCController {
     });
   };
 
-  relayICE = ({
-    peerId,
-    iceCandidate,
-  }: {
+  relayICE = ({peerId, iceCandidate}: {
     peerId: string;
     iceCandidate: string;
   }) => {
     this.io
-      .to(peerId)
-      .emit("ICE_CANDIDATE", { peerId: this.socket.id, iceCandidate });
+        .to(peerId)
+        .emit("ICE_CANDIDATE", {peerId: this.socket.id, iceCandidate});
   };
 }
 

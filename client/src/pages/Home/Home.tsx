@@ -1,24 +1,24 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import Hero from '@/src/components/pages/home/Hero/Hero'
 import List from '@/src/components/UI/List/List'
 import styles from './Home.module.scss'
-import { Item } from '@/src/components/UI/List/types'
-import { useRouter } from 'next/navigation'
-import { ACTIONS } from '@/src/contexts/SocketContext'
+import {Item} from '@/src/components/UI/List/types'
+import {useRouter} from 'next/navigation'
+import {ACTIONS} from '@/src/contexts/SocketContext'
 import useSocketContext from '@/src/hooks/useSocketContext'
-import { roomHref } from '@/src/utils/room.utils'
-import { RoomResponse } from '@/src/types/response/RoomResponse'
+import {roomHref} from '@/src/utils/room.utils'
+import {RoomResponse} from '@/src/types/response/RoomResponse'
 
 const Home = () => {
-  const [rooms, setRooms] = useState<RoomResponse[]>([])
+  const [rooms, setRooms] = useState<string[]>([])
   const [listItems, setListItems] = useState<Item[]>([])
-  const { push } = useRouter()
-  const { socket } = useSocketContext()
+  const {push} = useRouter()
+  const {socket} = useSocketContext()
 
   useEffect(() => {
     if (socket) {
-      socket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] }) => {
+      socket.on(ACTIONS.SHARE_ROOMS, ({rooms = []}) => {
         console.log('on SHARE_ROOMS')
         setRooms(rooms)
       })
@@ -32,27 +32,24 @@ const Home = () => {
   useEffect(() => {
     const items: Item[] = rooms.map((room): Item => {
       return {
-        id: room.id,
-        content: `
-            User: ${room.user.name}
-            Room name: ${room.name}
-          `,
-        handleOnClick: () => push(roomHref(room.id)),
+        id: room,
+        content: `Room name: ${room}`,
+        handleOnClick: () => push(roomHref(room)),
       }
     })
     setListItems(items)
   }, [rooms])
 
   return (
-    <div className={styles.home}>
-      <Hero />
+      <div className={styles.home}>
+        <Hero/>
 
-      {/*todo separate in component*/}
-      <div style={{ margin: '2em' }}>
-        <h2>Global public rooms</h2>
-        {listItems.length ? <List items={listItems} /> : <h3>Rooms not found</h3>}
+        {/*todo separate in component*/}
+        <div style={{margin: '2em'}}>
+          <h2>Global public rooms</h2>
+          {listItems.length ? <List items={listItems}/> : <h3>Rooms not found</h3>}
+        </div>
       </div>
-    </div>
   )
 }
 
