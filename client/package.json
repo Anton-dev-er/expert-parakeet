@@ -1,7 +1,8 @@
 {
-  "name": "pdp-next-ent-app",
-  "version": "0.1.0",
-  "private": true,
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "start": "next dev",
@@ -31,5 +32,7 @@
     "prettier": "3.2.4",
     "sass": "^1.70.0",
     "typescript": "^5"
-  }
+  },
+  "author": "",
+  "license": "ISC"
 }
