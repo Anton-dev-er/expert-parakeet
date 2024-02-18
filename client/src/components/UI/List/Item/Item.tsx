@@ -1,6 +1,6 @@
-import React, { FC } from "react";
-import styles from "./Item.module.scss";
-import { Item } from "@/src/components/UI/List/types";
+import React, { FC } from 'react';
+import styles from './Item.module.scss';
+import { Item } from '@/src/components/UI/List/types';
 
 const Item: FC<Item> = ({ content, ImageComponent, id, handleOnClick }) => {
   return (

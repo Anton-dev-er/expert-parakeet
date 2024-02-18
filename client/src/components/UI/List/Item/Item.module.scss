@@ -1,4 +1,4 @@
-@import "src/styles/variables.module";
+@import 'src/styles/variables.module';
 
 .item {
   display: flex;
@@ -8,7 +8,7 @@
 
   p {
     white-space: pre-line;
-  };
+  }
 
   &:hover {
     background-color: $bright-grey;
@@ -17,5 +17,4 @@
   &:has(div) p {
     margin-left: 1em;
   }
-
 }

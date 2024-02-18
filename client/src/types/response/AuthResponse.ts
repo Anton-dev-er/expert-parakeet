@@ -1,7 +1,7 @@
-import { User } from '@/src/types'
+import { User } from '@/src/types';
 
 export interface AuthResponse {
-  accessToken: string
-  refreshToken: string
-  user: User
+  accessToken: string;
+  refreshToken: string;
+  user: User;
 }

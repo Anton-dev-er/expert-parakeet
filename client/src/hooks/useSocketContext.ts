@@ -1,7 +1,7 @@
-'use client'
-import { useContext } from 'react'
-import { SocketContext } from '@/src/contexts/SocketContext'
+'use client';
+import { useContext } from 'react';
+import { SocketContext } from '@/src/contexts/SocketContext';
 
-const useSocketContext = () => useContext(SocketContext)
+const useSocketContext = () => useContext(SocketContext);
 
-export default useSocketContext
+export default useSocketContext;

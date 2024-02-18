@@ -1,8 +1,6 @@
-@import "src/styles/variables.module";
+@import 'src/styles/variables.module';
 
 .layout {
   display: grid;
   grid-template-columns: 2fr 7fr 3fr;
 }
-
-

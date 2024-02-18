@@ -1,15 +1,14 @@
-'use client'
-import { createContext, FC, ReactNode, useEffect, useState } from 'react'
-import io, { Socket } from 'socket.io-client'
-
-const BASE_URL = 'http://localhost:5555'
+'use client';
+import { createContext, FC, ReactNode, useEffect, useState } from 'react';
+import io, { Socket } from 'socket.io-client';
+import { BASE_URL } from '@/src/http';
 
 const options = {
   'force new connection': true,
   reconnectionAttempts: 100,
   timeout: 10000,
   transports: ['websocket'],
-}
+};
 const ACTIONS = {
   JOIN: 'JOIN',
   LEAVE: 'LEAVE',
@@ -20,27 +19,27 @@ const ACTIONS = {
   RELAY_ICE: 'RELAY_ICE',
   SESSION_DESCRIPTION: 'SESSION_DESCRIPTION',
   ICE_CANDIDATE: 'ICE_CANDIDATE',
-}
+};
 
 interface SocketContextType {
-  socket: Socket | undefined
+  socket: Socket | undefined;
 }
 
-export const SocketContext = createContext<SocketContextType>({} as SocketContextType)
+export const SocketContext = createContext<SocketContextType>({} as SocketContextType);
 
 export const SocketContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [socket, setSocket] = useState<Socket>()
+  const [socket, setSocket] = useState<Socket>();
 
   useEffect(() => {
     if (!socket) {
-      const connection = io(BASE_URL, options)
-      console.log('new connection')
-      setSocket(connection)
+      const connection = io(BASE_URL, options);
+      console.log('new connection');
+      setSocket(connection);
     }
     return () => {
-      socket?.disconnect()
-    }
-  }, [])
+      socket?.disconnect();
+    };
+  }, []);
 
   return (
     <SocketContext.Provider
@@ -50,7 +49,7 @@ export const SocketContextProvider: FC<{ children: ReactNode }> = ({ children })
     >
       {children}
     </SocketContext.Provider>
-  )
-}
+  );
+};
 
-export { ACTIONS }
+export { ACTIONS };

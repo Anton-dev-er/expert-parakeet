@@ -1,21 +1,21 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import Modal from '@/src/components/UI/Modal/Modal'
-import Button from '@/src/components/UI/Button/Button'
-import RoomService from '@/src/services/RoomService'
-import useAuthContext from '@/src/hooks/useAuthContext'
-import List from '@/src/components/UI/List/List'
-import { Item } from '@/src/components/UI/List/types'
-import { useRouter } from 'next/navigation'
-import { roomHref } from '@/src/utils/room.utils'
-import { RoomResponse } from '@/src/types/response/RoomResponse'
+'use client';
+import React, { useEffect, useState } from 'react';
+import Modal from '@/src/components/UI/Modal/Modal';
+import Button from '@/src/components/UI/Button/Button';
+import RoomService from '@/src/services/RoomService';
+import useAuthContext from '@/src/hooks/useAuthContext';
+import List from '@/src/components/UI/List/List';
+import { Item } from '@/src/components/UI/List/types';
+import { useRouter } from 'next/navigation';
+import { roomHref } from '@/src/utils/room.utils';
+import { RoomResponse } from '@/src/types/response/RoomResponse';
 
 const JoinRoomModal = () => {
-  const [open, setOpen] = useState(false)
-  const [userPublicRooms, setUserPublicRooms] = useState<Item[]>([])
-  const [userPrivateRooms, setUserPrivateRooms] = useState<Item[]>([])
-  const { auth, user } = useAuthContext()
-  const { push } = useRouter()
+  const [open, setOpen] = useState(false);
+  const [userPublicRooms, setUserPublicRooms] = useState<Item[]>([]);
+  const [userPrivateRooms, setUserPrivateRooms] = useState<Item[]>([]);
+  const { auth, user } = useAuthContext();
+  const { push } = useRouter();
 
   const getFilteredRoomList = (rooms: RoomResponse[], isPrivate = false) => {
     return rooms
@@ -25,26 +25,26 @@ const JoinRoomModal = () => {
           content: room.name,
           id: room.id,
           handleOnClick: () => push(roomHref(room.id)),
-        }
-      })
-  }
+        };
+      });
+  };
 
   useEffect(() => {
     if (auth && user) {
       RoomService.getUserRooms(user.id).then((rooms) => {
-        setUserPublicRooms(getFilteredRoomList(rooms, false))
-        setUserPrivateRooms(getFilteredRoomList(rooms, true))
-      })
+        setUserPublicRooms(getFilteredRoomList(rooms, false));
+        setUserPrivateRooms(getFilteredRoomList(rooms, true));
+      });
     }
-  }, [user])
+  }, [user]);
 
   const handleOnOpen = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   const handleOnClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   return (
     <>
@@ -69,7 +69,7 @@ const JoinRoomModal = () => {
         {!userPublicRooms.length && !userPrivateRooms.length && <h3>Rooms not found</h3>}
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default JoinRoomModal
+export default JoinRoomModal;

@@ -1,5 +1,5 @@
 const roomHref = (userRoomId: string) => {
-  return `/room/${userRoomId}`
-}
+  return `/room/${userRoomId}`;
+};
 
-export { roomHref }
+export { roomHref };

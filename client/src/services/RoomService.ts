@@ -1,12 +1,12 @@
-import Http from '../http/index'
-import { RoomResponse } from '@/src/types/response/RoomResponse'
-import useAuthContext from '@/src/hooks/useAuthContext'
+import Http from '../http/index';
+import { RoomResponse } from '@/src/types/response/RoomResponse';
+import useAuthContext from '@/src/hooks/useAuthContext';
 
 export default class RoomService {
-  static api = new Http('http://localhost:5555/api/rooms', true)
+  static api = new Http('/api/rooms', true);
 
   static async getUserRooms(userId: string): Promise<RoomResponse[]> {
-    return this.api.get(`/${userId}`)
+    return this.api.get(`/${userId}`);
   }
 
   static async createRoom(
@@ -16,6 +16,6 @@ export default class RoomService {
     isPrivate: boolean,
     isOwner: boolean
   ): Promise<RoomResponse> {
-    return this.api.post(`/${userId}`, { roomName, roomRoute, isPrivate, isOwner })
+    return this.api.post(`/${userId}`, { roomName, roomRoute, isPrivate, isOwner });
   }
 }

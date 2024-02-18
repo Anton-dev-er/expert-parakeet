@@ -1,180 +1,182 @@
-import {useCallback, useEffect, useRef} from 'react'
-import useStateWithCallback from './useStateWithCallback'
+import { useCallback, useEffect, useRef } from 'react';
+import useStateWithCallback from './useStateWithCallback';
 // @ts-ignore there no @types for freeice
-import freeice from 'freeice'
-import {ACTIONS} from '@/src/contexts/SocketContext'
-import {DefaultEventsMap} from '@socket.io/component-emitter'
-import {Socket} from 'socket.io-client'
+import freeice from 'freeice';
+import { ACTIONS } from '@/src/contexts/SocketContext';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { Socket } from 'socket.io-client';
 
-export const LOCAL_VIDEO = 'LOCAL_VIDEO'
+export const LOCAL_VIDEO = 'LOCAL_VIDEO';
 
 type PeerMediaElements = {
-  [key: string]: HTMLMediaElement | null
-}
+  [key: string]: HTMLMediaElement | null;
+};
 
 type PeerConnections = {
-  [key: string]: RTCPeerConnection | null
-}
+  [key: string]: RTCPeerConnection | null;
+};
 
 export default function useWebRTC(
-    roomName: string,
-    socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
+  roomName: string,
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
 ) {
-  const [clients, updateClients] = useStateWithCallback([])
+  const [clients, updateClients] = useStateWithCallback([]);
 
   const addNewClient = useCallback(
-      (newClient: string, callback: any) => {
-        if (!clients.includes(newClient)) {
-          updateClients((list: string[]) => [...list, newClient], callback)
-        }
-      },
-      [clients, updateClients]
-  )
+    (newClient: string, callback: any) => {
+      if (!clients.includes(newClient)) {
+        updateClients((list: string[]) => [...list, newClient], callback);
+      }
+    },
+    [clients, updateClients]
+  );
 
-  const peerConnections = useRef<PeerConnections>({})
-  const localMediaStream = useRef<MediaStream | null>(null)
-  const peerMediaElements = useRef<PeerMediaElements>({})
+  const peerConnections = useRef<PeerConnections>({});
+  const localMediaStream = useRef<MediaStream | null>(null);
+  const peerMediaElements = useRef<PeerMediaElements>({});
 
   const handleNewPeer = async ({
-                                 createOffer,
-                                 peerId,
-                               }: {
-    peerId: string
-    createOffer: boolean
+    createOffer,
+    peerId,
+  }: {
+    peerId: string;
+    createOffer: boolean;
   }) => {
+    console.log('handleNewPeer');
     if (peerId in peerConnections.current) {
-      return console.warn(`Already connected to peer ${peerId}`)
+      return console.warn(`Already connected to peer ${peerId}`);
     }
 
-    const peerConnection = new RTCPeerConnection({iceServers: freeice()})
-    const localStream = localMediaStream.current
+    const peerConnection = new RTCPeerConnection({ iceServers: freeice() });
+    const localStream = localMediaStream.current;
 
     peerConnection.onicecandidate = (event) => {
-      const iceCandidate = event.candidate
+      console.log('onicecandidate');
+      const iceCandidate = event.candidate;
       if (iceCandidate) {
-        socket?.emit(ACTIONS.RELAY_ICE, {peerId, iceCandidate})
+        socket?.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate });
       }
-    }
+    };
 
-    peerConnection.ontrack = ({streams: [remoteStream]}) => {
+    peerConnection.ontrack = ({ streams: [remoteStream] }) => {
+      console.log('ontrack:', peerId);
       addNewClient(peerId, () => {
-        const peerMediaElement = peerMediaElements.current[peerId]
+        const peerMediaElement = peerMediaElements.current[peerId];
         if (peerMediaElement) {
-          peerMediaElement.srcObject = remoteStream
+          peerMediaElement.srcObject = remoteStream;
         }
-      })
-    }
+      });
+    };
 
-    peerConnections.current[peerId] = peerConnection
+    peerConnections.current[peerId] = peerConnection;
 
     if (localStream) {
       localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream)
-      })
+        peerConnection.addTrack(track, localStream);
+      });
     } else {
-      console.warn('Local stream is none')
+      console.warn('Local stream is none');
     }
 
     if (createOffer) {
-      const offer = await peerConnection.createOffer()
+      const offer = await peerConnection.createOffer();
 
-      await peerConnection.setLocalDescription(offer)
+      await peerConnection.setLocalDescription(offer);
 
       socket?.emit(ACTIONS.RELAY_SDP, {
         peerId,
         sessionDescription: offer,
-      })
+      });
     }
-  }
+  };
 
   const setRemoteMedia = async ({
-                                  peerId,
-                                  sessionDescription: remoteDescription,
-                                }: {
-    peerId: string
-    sessionDescription: RTCSessionDescriptionInit
+    peerId,
+    sessionDescription: remoteDescription,
+  }: {
+    peerId: string;
+    sessionDescription: RTCSessionDescriptionInit;
   }) => {
-    const peerConnection = peerConnections.current[peerId]
+    const peerConnection = peerConnections.current[peerId];
     if (peerConnection) {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription));
 
       if (remoteDescription.type === 'offer') {
-        const answer = await peerConnection.createAnswer()
+        const answer = await peerConnection.createAnswer();
 
-        await peerConnection.setLocalDescription(answer)
+        await peerConnection.setLocalDescription(answer);
 
-        socket?.emit(ACTIONS.RELAY_SDP, {peerId, sessionDescription: answer})
+        socket?.emit(ACTIONS.RELAY_SDP, { peerId, sessionDescription: answer });
       }
     } else {
-      console.warn('Peer connection is null')
+      console.warn('Peer connection is null');
     }
-  }
+  };
 
-  const handleRemovePeer = async ({peerId}: { peerId: string }) => {
-    const peerConnection = peerConnections.current[peerId]
-    peerConnection?.close()
+  const handleRemovePeer = async ({ peerId }: { peerId: string }) => {
+    const peerConnection = peerConnections.current[peerId];
+    peerConnection?.close();
 
-    delete peerConnections.current[peerId]
-    delete peerMediaElements.current[peerId]
+    delete peerConnections.current[peerId];
+    delete peerMediaElements.current[peerId];
 
-    updateClients((list: string[]) => list.filter((c) => c !== peerId))
-  }
+    updateClients((list: string[]) => list.filter((c) => c !== peerId));
+  };
 
   useEffect(() => {
     if (socket) {
-      socket.on(ACTIONS.ADD_PEER, handleNewPeer)
-      socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer)
-      socket.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia)
+      socket.on(ACTIONS.ADD_PEER, handleNewPeer);
+      socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
+      socket.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia);
       socket.on(
-          ACTIONS.ICE_CANDIDATE,
-          ({peerId, iceCandidate}: { peerId: string; iceCandidate: any }) => {
-            const peerConnection = peerConnections.current[peerId]
-            void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate))
-          }
-      )
+        ACTIONS.ICE_CANDIDATE,
+        ({ peerId, iceCandidate }: { peerId: string; iceCandidate: any }) => {
+          const peerConnection = peerConnections.current[peerId];
+          void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate));
+        }
+      );
     }
-
-  }, [socket])
+  }, [socket]);
 
   useEffect(() => {
-    console.log("RoomName:", roomName)
+    console.log('RoomName:', roomName);
     if (socket && roomName) {
       const startCapture = async () => {
         localMediaStream.current = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: true,
-        })
+        });
 
         addNewClient(LOCAL_VIDEO, () => {
-          const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+          console.log('addNewClient LOCAL_VIDEO:', LOCAL_VIDEO);
+          const localVideoElement = peerMediaElements.current[LOCAL_VIDEO];
           if (localVideoElement) {
-            localVideoElement.volume = 0
-            localVideoElement.srcObject = localMediaStream.current
+            localVideoElement.volume = 0;
+            localVideoElement.srcObject = localMediaStream.current;
           }
-        })
-      }
+        });
+      };
 
       startCapture()
-          .then(() => socket.emit(ACTIONS.JOIN, {room: roomName}))
-          .catch(() => console.error('Error getting userMedia'))
+        .then(() => socket.emit(ACTIONS.JOIN, { room: roomName }))
+        .catch(() => console.error('Error getting userMedia'));
     }
-
 
     return () => {
       if (localMediaStream.current) {
         localMediaStream.current.getTracks().forEach((track) => {
-          track.stop()
-        })
-        socket?.emit(ACTIONS.LEAVE)
+          track.stop();
+        });
+        socket?.emit(ACTIONS.LEAVE);
       } else {
-        console.warn('LocalMediaStream.current empty')
+        console.warn('LocalMediaStream.current empty');
       }
-    }
-  }, [socket, roomName])
+    };
+  }, [socket, roomName]);
 
   const provideMediaRef = useCallback((id: string, node: HTMLMediaElement) => {
-    peerMediaElements.current[id] = node
-  }, [])
+    peerMediaElements.current[id] = node;
+  }, []);
 
-  return {clients, provideMediaRef}
+  return { clients, provideMediaRef };
 }

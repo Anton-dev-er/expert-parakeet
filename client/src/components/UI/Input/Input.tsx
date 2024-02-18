@@ -1,17 +1,17 @@
-import React, { FC, HTMLInputTypeAttribute, useEffect, useState } from 'react'
-import styles from './Input.module.scss'
+import React, { FC, HTMLInputTypeAttribute, useEffect, useState } from 'react';
+import styles from './Input.module.scss';
 
 interface Input {
-  onChange: (value: string) => void
-  id: string
+  onChange: (value: string) => void;
+  id: string;
   validation?: {
-    function: (value: string) => boolean
-    message: string
-  }
-  type?: HTMLInputTypeAttribute | undefined
-  disabled?: boolean
-  placeholder?: string
-  label?: string
+    function: (value: string) => boolean;
+    message: string;
+  };
+  type?: HTMLInputTypeAttribute | undefined;
+  disabled?: boolean;
+  placeholder?: string;
+  label?: string;
 }
 
 const Input: FC<Input> = ({
@@ -23,43 +23,43 @@ const Input: FC<Input> = ({
   type = 'text',
   validation,
 }) => {
-  const [isFocus, setIsFocus] = useState(false)
-  const [value, setValue] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [isFocus, setIsFocus] = useState(false);
+  const [value, setValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value
-    onChange(value)
-    setValue(value)
-  }
+    const value = e.currentTarget.value;
+    onChange(value);
+    setValue(value);
+  };
 
   const validateValue = () => {
-    let isValid = true
+    let isValid = true;
     if (validation) {
-      isValid = validation?.function(value)
+      isValid = validation?.function(value);
     }
 
     if (isValid) {
-      setValue(value)
-      setErrorMessage('')
+      setValue(value);
+      setErrorMessage('');
     } else {
-      setErrorMessage(validation?.message || '')
+      setErrorMessage(validation?.message || '');
     }
-  }
+  };
 
   useEffect(() => {
-    validateValue()
-  }, [value, validation?.message, validation?.function])
+    validateValue();
+  }, [value, validation?.message, validation?.function]);
 
   const handleOptions = () => {
-    let newClasses = []
+    let newClasses = [];
 
     if (isFocus) {
-      newClasses.push(styles.focus)
+      newClasses.push(styles.focus);
     }
 
-    return newClasses.join(' ')
-  }
+    return newClasses.join(' ');
+  };
 
   return (
     <div className={`${styles.input} ${handleOptions()}`}>
@@ -72,17 +72,17 @@ const Input: FC<Input> = ({
         disabled={disabled}
         onChange={handleOnChange}
         onFocus={() => {
-          setIsFocus(true)
+          setIsFocus(true);
         }}
         onBlur={() => {
           if (!value) {
-            setIsFocus(false)
+            setIsFocus(false);
           }
         }}
       />
       {errorMessage && <p>{errorMessage} *</p>}
     </div>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;

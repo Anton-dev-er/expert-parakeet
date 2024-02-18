@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import styles from "./Card.module.scss";
+import React, { FC } from 'react';
+import styles from './Card.module.scss';
 
 interface Card {
   children: React.ReactNode;

@@ -1,12 +1,12 @@
-@import "src/styles/variables.module";
+@import 'src/styles/variables.module';
 
 .hero {
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 10em;
-  background: rgb(131,58,180);
-  background: radial-gradient(circle, rgba(242,67,145,1) 0%, rgba(192,0,92,1) 100%);
+  background: rgb(131, 58, 180);
+  background: radial-gradient(circle, rgba(242, 67, 145, 1) 0%, rgba(192, 0, 92, 1) 100%);
   padding-left: 2em;
   border-radius: 1em;
 
@@ -15,6 +15,6 @@
     margin-bottom: 0.5em;
   }
   button {
-    margin-right: .5em;
+    margin-right: 0.5em;
   }
 }

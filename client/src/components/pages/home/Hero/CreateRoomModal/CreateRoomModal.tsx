@@ -1,43 +1,43 @@
-'use client'
-import React, { useState } from 'react'
-import Modal from '@/src/components/UI/Modal/Modal'
-import Button from '@/src/components/UI/Button/Button'
-import Input from '@/src/components/UI/Input/Input'
-import { useRouter } from 'next/navigation'
-import { v4 } from 'uuid'
-import useAuthContext from '@/src/hooks/useAuthContext'
-import { isValidRoomName } from '@/src/utils'
-import RoomService from '@/src/services/RoomService'
-import { roomHref } from '@/src/utils/room.utils'
+'use client';
+import React, { useState } from 'react';
+import Modal from '@/src/components/UI/Modal/Modal';
+import Button from '@/src/components/UI/Button/Button';
+import Input from '@/src/components/UI/Input/Input';
+import { useRouter } from 'next/navigation';
+import { v4 } from 'uuid';
+import useAuthContext from '@/src/hooks/useAuthContext';
+import { isValidRoomName } from '@/src/utils';
+import RoomService from '@/src/services/RoomService';
+import { roomHref } from '@/src/utils/room.utils';
 
 const CreateRoomModal = () => {
-  const [open, setOpen] = useState(false)
-  const [roomName, setRoomName] = useState('')
-  const { push } = useRouter()
-  const { auth, user } = useAuthContext()
+  const [open, setOpen] = useState(false);
+  const [roomName, setRoomName] = useState('');
+  const { push } = useRouter();
+  const { auth, user } = useAuthContext();
 
   const handleOnOpen = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   const handleOnClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   const formatRoomName = (roomName: string) => {
-    return encodeURI(roomName.toLowerCase().split(' ').join('-'))
-  }
+    return encodeURI(roomName.toLowerCase().split(' ').join('-'));
+  };
 
   const handleCreateRoom = async () => {
     if (!roomName || !auth || !user) {
-      return push(roomHref(v4()))
+      return push(roomHref(v4()));
     }
-    const roomRoute = formatRoomName(roomName)
-    const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true)
+    const roomRoute = formatRoomName(roomName);
+    const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true);
     if (room) {
-      push(roomHref(room.id))
+      push(roomHref(room.id));
     }
-  }
+  };
 
   return (
     <>
@@ -58,7 +58,7 @@ const CreateRoomModal = () => {
         <Button onClick={handleCreateRoom}>Create Room</Button>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default CreateRoomModal
+export default CreateRoomModal;

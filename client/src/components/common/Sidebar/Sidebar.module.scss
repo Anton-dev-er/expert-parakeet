@@ -1,4 +1,4 @@
-@import "src/styles/variables.module";
+@import 'src/styles/variables.module';
 
 .sidebar {
   position: relative;
@@ -13,7 +13,6 @@
     top: 0;
     background-color: $white;
     padding: 1em;
-
   }
 }
 
