@@ -12,8 +12,7 @@ import {AppDataSource} from "./src/data-source";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 6000;
-console.log("PORT:", PORT)
+const PORT = process.env.PORT || 5555;
 
 const server = require("http").createServer(app);
 const io = new Server<IO>(server, {
@@ -37,7 +36,7 @@ io.on("connection", (socket) => {
 
 const letsGo = async () => {
   try {
-    // await AppDataSource.initialize();
+    await AppDataSource.initialize();
     server.listen(PORT, () => console.log(`localhost:${PORT}`));
   } catch (e) {
     console.log(e);

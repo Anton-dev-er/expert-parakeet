@@ -2,7 +2,7 @@ import Http from '../http/index'
 import { AuthResponse } from '@/src/types/response/AuthResponse'
 
 export default class AuthService {
-  static api = new Http('http://localhost:5000/api/auth', true)
+  static api = new Http('http://localhost:5555/api/auth', true)
 
   static async login(email: string, password: string): Promise<AuthResponse> {
     return this.api.post('/login', { email, password })

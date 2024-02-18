@@ -2,7 +2,7 @@
 import { createContext, FC, ReactNode, useEffect, useState } from 'react'
 import io, { Socket } from 'socket.io-client'
 
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = 'http://localhost:5555'
 
 const options = {
   'force new connection': true,
