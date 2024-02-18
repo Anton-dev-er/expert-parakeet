@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Role, User } from '../types';
 import ApiError from '../errors/api.error';
 
-export default function (role: Role) {
-  return function (req: Request, res: Response, next: (error?: any) => any) {
+export default function(role: Role) {
+  return function(req: Request, res: Response, next: NextFunction) {
     if (req.method === 'OPTIONS') {
       next();
     }

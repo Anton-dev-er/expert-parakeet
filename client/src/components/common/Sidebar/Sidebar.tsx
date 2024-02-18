@@ -25,7 +25,6 @@ const list = [
   },
 ];
 
-
 const Sidebar = () => {
   const { logout, auth } = useAuthContext();
 

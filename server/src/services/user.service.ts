@@ -4,7 +4,7 @@ import { AppDataSource } from '../data-source';
 class UserService {
   readonly repo = AppDataSource.getRepository(UserEntity);
 
-  async create(email: string, password: string) {
+  async create(email: string) {
     const userEntity = new UserEntity();
     userEntity.name = email.split('@')[0];
     await this.repo.save(userEntity);

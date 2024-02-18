@@ -16,15 +16,18 @@ interface ClientToServerEvents {
   RELAY_ICE: (arg: { peerId: string; iceCandidate: string }) => void;
 }
 
-interface InterServerEvents {}
+interface InterServerEvents {
+}
 
-interface SocketData {}
+interface SocketData {
+}
 
 interface IO
   extends ServerToClientEvents,
     ClientToServerEvents,
     InterServerEvents,
     SocketData,
-    SocketData {}
+    SocketData {
+}
 
 export { ServerToClientEvents, ClientToServerEvents, SocketData, InterServerEvents, IO };

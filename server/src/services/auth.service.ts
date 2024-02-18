@@ -31,7 +31,7 @@ class AuthService {
       throw ApiError.BadRequest(`${email} already exists`);
     }
 
-    const userEntity = await userService.create(email, password);
+    const userEntity = await userService.create(email);
     const userLoginEntity = await userLoginService.create(email, password, userEntity);
 
     const userDto = new UserDto(userEntity, userLoginEntity);

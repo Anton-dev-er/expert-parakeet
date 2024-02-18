@@ -1,9 +1,9 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import ApiError from '../errors/api.error';
 import { UserRequest } from '../types';
 import tokenService from '../services/token.service';
 
-export default function (req: UserRequest, res: Response, next: any) {
+export default function(req: UserRequest, res: Response, next: NextFunction) {
   if (req.method === 'OPTIONS') {
     next();
   }

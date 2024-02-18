@@ -9,7 +9,7 @@ import RoomEntity from './entities/room.entity';
 import UserRoomEntity from './entities/user-room.entity';
 
 dotenv.config();
-const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE, ENV } = process.env;
+const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 
 // todo check if updatedAt updating
 export const AppDataSource = new DataSource({

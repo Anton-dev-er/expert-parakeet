@@ -1,7 +1,7 @@
 import ApiError from '../errors/api.error';
 import { Request, Response, NextFunction } from 'express';
 
-export default function (err: ApiError, req: Request, res: Response, next: NextFunction) {
+export default function(err: ApiError, req: Request, res: Response, next: NextFunction) {
   console.log('error handling middleware:', err);
 
   // todo, err.status it is bad check

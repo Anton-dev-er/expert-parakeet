@@ -8,7 +8,7 @@ router.post(
   '/registration',
   body('email').isEmail(),
   body('password').isLength({ min: 3, max: 32 }),
-  authController.registration
+  authController.registration,
 );
 router.post('/login', body('email').notEmpty(), body('password').notEmpty(), authController.login);
 router.post('/logout', authController.logout);

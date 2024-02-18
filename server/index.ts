@@ -8,13 +8,14 @@ import { Server } from 'socket.io';
 import { IO } from './src/types/webRTC.type';
 import dotenv from 'dotenv';
 import { AppDataSource } from './src/data-source';
+import http from 'http';
+
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5555;
-
-const server = require('http').createServer(app);
 const io = new Server<IO>(server, {
   cors: {
     origin: ['*'],
