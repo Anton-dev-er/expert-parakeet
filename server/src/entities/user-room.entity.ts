@@ -7,21 +7,21 @@ import {
   JoinColumn,
   ManyToOne,
   Column,
-} from "typeorm";
-import UserEntity from "./user.entity";
-import RoomEntity from "./room.entity";
+} from 'typeorm';
+import UserEntity from './user.entity';
+import RoomEntity from './room.entity';
 
-@Entity({ name: "user_room" })
+@Entity({ name: 'user_room' })
 export default class UserRoomEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => UserEntity, (user) => user.userRooms)
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @OneToOne(() => RoomEntity)
-  @JoinColumn({ name: "room_id" })
+  @JoinColumn({ name: 'room_id' })
   room: RoomEntity;
 
   @Column({ default: false })

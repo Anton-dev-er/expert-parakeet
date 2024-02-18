@@ -1,25 +1,17 @@
-import { NextFunction, Request, Response } from "express";
-import roomService from "../services/room.service";
-import userService from "../services/user.service";
-import userRoomService from "../services/user-room.service";
-import RoomDto from "../dtos/room.dto";
+import { NextFunction, Request, Response } from 'express';
+import roomService from '../services/room.service';
+import userService from '../services/user.service';
+import userRoomService from '../services/user-room.service';
+import RoomDto from '../dtos/room.dto';
 
 class RoomController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const { roomName, roomRoute, isPrivate, isOwner } = req.body;
       const { userId } = req.params;
-      const roomEntity = await roomService.create(
-        roomName,
-        roomRoute,
-        isPrivate,
-      );
+      const roomEntity = await roomService.create(roomName, roomRoute, isPrivate);
       const userEntity = await userService.getById(userId);
-      const userRoomEntity = await userRoomService.create(
-        userEntity,
-        roomEntity,
-        isOwner,
-      );
+      const userRoomEntity = await userRoomService.create(userEntity, roomEntity, isOwner);
 
       const roomDto = new RoomDto(userRoomEntity);
 

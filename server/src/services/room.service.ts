@@ -1,14 +1,10 @@
-import { AppDataSource } from "../data-source";
-import RoomEntity from "../entities/room.entity";
+import { AppDataSource } from '../data-source';
+import RoomEntity from '../entities/room.entity';
 
 class RoomService {
   readonly repo = AppDataSource.getRepository(RoomEntity);
 
-  async create(
-    roomName: string,
-    roomRoute: string,
-    isPrivate: boolean,
-  ): Promise<RoomEntity> {
+  async create(roomName: string, roomRoute: string, isPrivate: boolean): Promise<RoomEntity> {
     const roomEntity = new RoomEntity();
     roomEntity.name = roomName;
     roomEntity.route = roomRoute;

@@ -1,7 +1,6 @@
-import {Server, Socket} from "socket.io";
-import {IO} from "../types/webRTC.type";
-import userRoomService from "../services/user-room.service";
-import RoomDto from "../dtos/room.dto";
+import { Server, Socket } from 'socket.io';
+import { IO } from '../types/webRTC.type';
+import userRoomService from '../services/user-room.service';
 
 // todo move WebRTCHelper to services
 class WebRTCHelper {
@@ -18,12 +17,12 @@ class WebRTCHelper {
 
     const roomNames: string[] = [];
     fetchedSockets.forEach((socket) => {
-      const rooms = socket.rooms
+      const rooms = socket.rooms;
       rooms.forEach((room) => {
         if (room !== socket.id) {
           roomNames.push(room);
         }
-      })
+      });
     });
     return roomNames;
   };
@@ -47,38 +46,35 @@ class WebRTCController {
 
   async shareRoomsInfo() {
     const rooms: string[] = await this.helper.getValidClientRooms();
-    this.io.emit("SHARE_ROOMS", {rooms});
+    this.io.emit('SHARE_ROOMS', { rooms });
   }
 
-  joinRoom = async ({room: userRoomId}: { room: string }) => {
-    console.log("join room:", )
+  joinRoom = async ({ room: userRoomId }: { room: string }) => {
+    console.log('join room:');
     if (!this.socket) {
-      console.log("joinRoom, this socket empty, roomId:", userRoomId);
+      console.log('joinRoom, this socket empty, roomId:', userRoomId);
       return;
     }
 
-    const userRoom = userRoomService.getUserRoomByUserRoomId(userRoomId)
-    console.log("userRoomId:", userRoomId)
+    const userRoom = userRoomService.getUserRoomByUserRoomId(userRoomId);
+    console.log('userRoomId:', userRoomId);
     if (!userRoom) {
-      console.log("room doesnt not exists:", userRoomId);
+      console.log('room doesnt not exists:', userRoomId);
       return;
     }
 
-    const {rooms} = this.socket;
+    const { rooms } = this.socket;
     if (Array.from(rooms).includes(userRoomId)) {
-      console.warn("Already joined to this room");
-      return
+      console.warn('Already joined to this room');
+      return;
     }
-
 
     const clients = this.helper.getClientsByRoomId(userRoomId);
 
     clients.forEach((clientId) => {
-      this.socket
-          .to(clientId)
-          .emit("ADD_PEER", {peerId: this.socket.id, createOffer: false});
+      this.socket.to(clientId).emit('ADD_PEER', { peerId: this.socket.id, createOffer: false });
 
-      this.socket.emit("ADD_PEER", {peerId: clientId, createOffer: true});
+      this.socket.emit('ADD_PEER', { peerId: clientId, createOffer: true });
     });
     this.socket.join(userRoomId);
     this.shareRoomsInfo();
@@ -86,18 +82,18 @@ class WebRTCController {
 
   leaveRoom = () => {
     if (!this.socket) {
-      console.log("leaveRoom, this socket empty");
+      console.log('leaveRoom, this socket empty');
       return;
     }
 
-    const {rooms} = this.socket;
+    const { rooms } = this.socket;
 
     Array.from(rooms || []).forEach((roomId: string) => {
       const clients = this.helper.getClientsByRoomId(roomId);
 
       clients.forEach((clientID) => {
-        this.io.to(clientID).emit("REMOVE_PEER", {peerId: this.socket.id});
-        this.socket.emit("REMOVE_PEER", {peerId: clientID});
+        this.io.to(clientID).emit('REMOVE_PEER', { peerId: this.socket.id });
+        this.socket.emit('REMOVE_PEER', { peerId: clientID });
       });
 
       this.socket.leave(roomId);
@@ -106,23 +102,21 @@ class WebRTCController {
     this.shareRoomsInfo();
   };
 
-  relaySDP = ({peerId, sessionDescription}: {
+  relaySDP = ({
+    peerId,
+    sessionDescription,
+  }: {
     peerId: string;
     sessionDescription: RTCSessionDescriptionInit;
   }) => {
-    this.io.to(peerId).emit("SESSION_DESCRIPTION", {
+    this.io.to(peerId).emit('SESSION_DESCRIPTION', {
       peerId: this.socket.id,
       sessionDescription,
     });
   };
 
-  relayICE = ({peerId, iceCandidate}: {
-    peerId: string;
-    iceCandidate: string;
-  }) => {
-    this.io
-        .to(peerId)
-        .emit("ICE_CANDIDATE", {peerId: this.socket.id, iceCandidate});
+  relayICE = ({ peerId, iceCandidate }: { peerId: string; iceCandidate: string }) => {
+    this.io.to(peerId).emit('ICE_CANDIDATE', { peerId: this.socket.id, iceCandidate });
   };
 }
 

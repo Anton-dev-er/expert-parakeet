@@ -1,7 +1,7 @@
-import {AppDataSource} from "../data-source";
-import UserRoomEntity from "../entities/user-room.entity";
-import UserEntity from "../entities/user.entity";
-import RoomEntity from "../entities/room.entity";
+import { AppDataSource } from '../data-source';
+import UserRoomEntity from '../entities/user-room.entity';
+import UserEntity from '../entities/user.entity';
+import RoomEntity from '../entities/room.entity';
 
 class UserRoomService {
   readonly repo = AppDataSource.getRepository(UserRoomEntity);
@@ -9,7 +9,7 @@ class UserRoomService {
   async create(user: UserEntity, room: RoomEntity, isOwner: boolean) {
     const userRoom = await this.getUserRoomByRoomIdAndUserId(room.id, user.id);
     if (userRoom) {
-      console.log("userRoom already exists:", room.name, user.name);
+      console.log('userRoom already exists:', room.name, user.name);
       return userRoom;
     }
 
@@ -23,33 +23,33 @@ class UserRoomService {
   }
 
   async getUserRoomByRoomIdAndUserId(roomId: string, userId: string) {
-    return this.repo.findOneBy({room: {id: roomId}, user: {id: userId}});
+    return this.repo.findOneBy({ room: { id: roomId }, user: { id: userId } });
   }
 
   async getAllUserRoomsByUserId(userId: string) {
     return await this.repo.find({
-      where: {user: {id: userId}},
-      relations: {room: true, user: true},
+      where: { user: { id: userId } },
+      relations: { room: true, user: true },
     });
   }
 
   async getUserRoomByUserRoomId(userRoomId: string) {
     try {
       return await this.repo.findOne({
-        where: {id: userRoomId},
-        relations: {room: true, user: true},
+        where: { id: userRoomId },
+        relations: { room: true, user: true },
       });
     } catch (e) {
-      console.error("error:", e)
-      return null
+      console.error('error:', e);
+      return null;
     }
   }
 
   async getAllUserRooms() {
     // only public
     return await this.repo.find({
-      where: {room: {is_private: false}},
-      relations: {room: true, user: true},
+      where: { room: { is_private: false } },
+      relations: { room: true, user: true },
     });
   }
 }

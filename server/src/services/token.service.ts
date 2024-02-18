@@ -1,16 +1,16 @@
-import UserDto from "../dtos/user.dto";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import userLoginService from "./user-login.service";
-import { JwtAccessTokenPayload } from "../types";
+import UserDto from '../dtos/user.dto';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import userLoginService from './user-login.service';
+import { JwtAccessTokenPayload } from '../types';
 
 class TokenService {
   generateTokens(payload: UserDto) {
     const accessToken = jwt.sign({ payload }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "1d",
+      expiresIn: '1d',
     });
     const refreshToken = jwt.sign({ payload }, process.env.JWT_REFRESH_SECRET, {
-      expiresIn: "30d",
+      expiresIn: '30d',
     });
     return {
       accessToken,
@@ -31,10 +31,7 @@ class TokenService {
 
   validateAccessToken(token: string): UserDto {
     try {
-      const payload = jwt.verify(
-        token,
-        process.env.JWT_ACCESS_SECRET,
-      ) as JwtAccessTokenPayload;
+      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET) as JwtAccessTokenPayload;
       return payload.payload;
     } catch (e) {
       return null;

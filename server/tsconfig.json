@@ -1,14 +1,14 @@
 {
-   "compilerOptions": {
-      "lib": ["es6", "dom", "es2016"],
-      "target": "es5",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "outDir": "./build",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "esModuleInterop": true,
-      "sourceMap": true,
-      "allowSyntheticDefaultImports": true
-   }
+  "compilerOptions": {
+    "lib": ["es6", "dom", "es2016"],
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true
+  }
 }

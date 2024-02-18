@@ -5,12 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from "typeorm";
-import UserRoomEntity from "./user-room.entity";
+} from 'typeorm';
+import UserRoomEntity from './user-room.entity';
 
-@Entity({ name: "user" })
+@Entity({ name: 'user' })
 export default class UserEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })

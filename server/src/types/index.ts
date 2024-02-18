@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import UserDto from "../dtos/user.dto";
-import { JwtPayload } from "jsonwebtoken";
+import { Request, Response } from 'express';
+import UserDto from '../dtos/user.dto';
+import { JwtPayload } from 'jsonwebtoken';
 
-type Role = "Admin" | "User";
+type Role = 'Admin' | 'User';
 
 interface User {
   role: Role;

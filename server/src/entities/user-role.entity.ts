@@ -7,21 +7,21 @@ import {
   OneToOne,
   JoinColumn,
   ManyToOne,
-} from "typeorm";
-import UserEntity from "./user.entity";
-import RoleEntity from "./role.entity";
+} from 'typeorm';
+import UserEntity from './user.entity';
+import RoleEntity from './role.entity';
 
-@Entity({ name: "user_role" })
+@Entity({ name: 'user_role' })
 export default class UserRoleEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @OneToOne(() => UserEntity)
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @OneToOne(() => RoleEntity)
-  @JoinColumn({ name: "role_id" })
+  @JoinColumn({ name: 'role_id' })
   role: RoleEntity;
 
   @CreateDateColumn()

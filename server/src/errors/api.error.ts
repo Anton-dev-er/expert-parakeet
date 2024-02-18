@@ -1,5 +1,5 @@
 class ApiError extends Error {
-  type: 'ApiError'
+  type: 'ApiError';
   status: number;
   errors: string[];
 
@@ -13,17 +13,17 @@ class ApiError extends Error {
     return new ApiError(400, message, errors);
   }
 
-  static UnauthorizedError(message = "Not Authorized") {
-    return new ApiError(401, message)
+  static UnauthorizedError(message = 'Not Authorized') {
+    return new ApiError(401, message);
   }
 
-  static internal(message = "Internal error") {
-    return new ApiError(500, message)
+  static internal(message = 'Internal error') {
+    return new ApiError(500, message);
   }
 
-  static forbidden(message = "Forbidden") {
-    return new ApiError(403, message)
+  static forbidden(message = 'Forbidden') {
+    return new ApiError(403, message);
   }
 }
 
-export default ApiError
+export default ApiError;

@@ -1,6 +1,6 @@
-import RoomEntity from "../entities/room.entity";
-import UserRoomEntity from "../entities/user-room.entity";
-import UserEntity from "../entities/user.entity";
+import RoomEntity from '../entities/room.entity';
+import UserRoomEntity from '../entities/user-room.entity';
+import UserEntity from '../entities/user.entity';
 
 export default class RoomDto {
   id: string;

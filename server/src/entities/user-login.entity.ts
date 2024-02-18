@@ -6,16 +6,16 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
-} from "typeorm";
-import UserEntity from "./user.entity";
+} from 'typeorm';
+import UserEntity from './user.entity';
 
-@Entity({ name: "user_login" })
+@Entity({ name: 'user_login' })
 export default class UserLoginEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @OneToOne(() => UserEntity, { cascade: true })
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @Column({ nullable: false })
