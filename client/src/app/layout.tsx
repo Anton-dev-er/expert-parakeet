@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import '@/src/styles/normalize.css';
 import '@/src/styles/globals.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import { AuthContext, AuthContextProvider } from '@/src/contexts/AuthContext';
+import { AuthContextProvider } from '@/src/contexts/AuthContext';
 import { SocketContextProvider } from '@/src/contexts/SocketContext';
 
 config.autoAddCss = false;

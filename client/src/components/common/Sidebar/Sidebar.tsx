@@ -25,7 +25,6 @@ const list = [
   },
 ];
 
-const list2 = [{ content: 'Account' }, { content: 'Settings' }, { content: 'History' }];
 
 const Sidebar = () => {
   const { logout, auth } = useAuthContext();
