@@ -6,9 +6,8 @@ import Input from '@/src/components/UI/Input/Input';
 import { useRouter } from 'next/navigation';
 import { v4 } from 'uuid';
 import useAuthContext from '@/src/hooks/useAuthContext';
-import { isValidRoomName } from '@/src/utils';
 import RoomService from '@/src/services/RoomService';
-import { roomHref } from '@/src/utils/room.utils';
+import { roomHref, isValidRoomName } from '@/src/utils/roomUtils';
 
 const CreateRoomModal = () => {
   const [open, setOpen] = useState(false);

@@ -7,7 +7,7 @@ import useAuthContext from '@/src/hooks/useAuthContext';
 import List from '@/src/components/UI/List/List';
 import { Item } from '@/src/components/UI/List/types';
 import { useRouter } from 'next/navigation';
-import { roomHref } from '@/src/utils/room.utils';
+import { roomHref } from '@/src/utils/roomUtils';
 import { RoomResponse } from '@/src/types/response/RoomResponse';
 
 const JoinRoomModal = () => {

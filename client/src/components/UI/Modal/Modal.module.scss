@@ -12,7 +12,7 @@
   background-color: rgb(149, 149, 149, 0.2);
 }
 
-.modal-content {
+.content {
   position: relative;
   background-color: $white;
   margin: auto;
@@ -26,11 +26,11 @@
   border-radius: 1em;
 }
 
-.modal-header {
+.header {
   padding: 1em;
 }
 
-.modal-body {
+.body {
   padding: 1em;
 }
 

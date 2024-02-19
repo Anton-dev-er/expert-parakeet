@@ -1,6 +1,5 @@
 import Http from '../http/index';
 import { RoomResponse } from '@/src/types/response/RoomResponse';
-import useAuthContext from '@/src/hooks/useAuthContext';
 
 export default class RoomService {
   static api = new Http('/api/rooms', true);

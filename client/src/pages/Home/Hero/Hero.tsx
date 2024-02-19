@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import styles from './Hero.module.scss';
-import CreateRoomModal from '@/src/components/pages/home/Hero/CreateRoomModal/CreateRoomModal';
-import JoinRoomModal from '@/src/components/pages/home/Hero/JoinRoomModal/JoinRoomModal';
+import JoinRoomModal from '@/src/pages/Home/Hero/JoinRoomModal/JoinRoomModal';
+import CreateRoomModal from '@/src/pages/Home/Hero/CreateRoomModal/CreateRoomModal';
 
 const Hero = () => {
   return (

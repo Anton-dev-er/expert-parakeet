@@ -1,39 +1,45 @@
-import { useCallback, useEffect, useRef } from 'react';
-import useStateWithCallback from './useStateWithCallback';
-// @ts-ignore there no @types for freeice
+'use client';
+import { useEffect, useRef, useState } from 'react';
+// @ts-expect-error there no @types for freeice
 import freeice from 'freeice';
 import { ACTIONS } from '@/src/contexts/SocketContext';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { Socket } from 'socket.io-client';
-
-export const LOCAL_VIDEO = 'LOCAL_VIDEO';
-
-type PeerMediaElements = {
-  [key: string]: HTMLMediaElement | null;
-};
-
-type PeerConnections = {
-  [key: string]: RTCPeerConnection | null;
-};
+import { LOCAL_CLIENT, PeerConnection, PeerMediaElement } from '@/src/types/webRTCType';
+import { getUserMedia } from '@/src/utils/mediaUtils';
 
 export default function useWebRTC(
   roomName: string,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
 ) {
-  const [clients, updateClients] = useStateWithCallback([]);
+  const [peerMediaElements, setPeerMediaElements] = useState<PeerMediaElement[]>([]);
 
-  const addNewClient = useCallback(
-    (newClient: string, callback: any) => {
-      if (!clients.includes(newClient)) {
-        updateClients((list: string[]) => [...list, newClient], callback);
-      }
-    },
-    [clients, updateClients]
-  );
-
-  const peerConnections = useRef<PeerConnections>({});
+  const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
-  const peerMediaElements = useRef<PeerMediaElements>({});
+
+  const addNewClient = (newClient: string, stream: MediaStream) => {
+    if (newClient && stream) {
+      setPeerMediaElements((peerMediaElements) => {
+        const isClientAlreadyExists = peerMediaElements.some(({ client }) => client === newClient);
+        if (isClientAlreadyExists) {
+          // replace old stream with new
+          return peerMediaElements.map((client) => {
+            if (client.client === newClient) {
+              client.stream = stream;
+            }
+            return client;
+          });
+        } else {
+          return [...peerMediaElements, { client: newClient, stream: stream }];
+        }
+      });
+    }
+  };
+
+  const replaceLocalMedia = async () => {
+    const newStream = await getUserMedia();
+    addNewClient(LOCAL_CLIENT, newStream);
+  };
 
   const handleNewPeer = async ({
     createOffer,
@@ -42,7 +48,6 @@ export default function useWebRTC(
     peerId: string;
     createOffer: boolean;
   }) => {
-    console.log('handleNewPeer');
     if (peerId in peerConnections.current) {
       return console.warn(`Already connected to peer ${peerId}`);
     }
@@ -51,7 +56,6 @@ export default function useWebRTC(
     const localStream = localMediaStream.current;
 
     peerConnection.onicecandidate = (event) => {
-      console.log('onicecandidate');
       const iceCandidate = event.candidate;
       if (iceCandidate) {
         socket?.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate });
@@ -59,13 +63,8 @@ export default function useWebRTC(
     };
 
     peerConnection.ontrack = ({ streams: [remoteStream] }) => {
-      console.log('ontrack:', peerId);
-      addNewClient(peerId, () => {
-        const peerMediaElement = peerMediaElements.current[peerId];
-        if (peerMediaElement) {
-          peerMediaElement.srcObject = remoteStream;
-        }
-      });
+      // on track called twice on audio and video
+      addNewClient(peerId, remoteStream);
     };
 
     peerConnections.current[peerId] = peerConnection;
@@ -118,9 +117,9 @@ export default function useWebRTC(
     peerConnection?.close();
 
     delete peerConnections.current[peerId];
-    delete peerMediaElements.current[peerId];
-
-    updateClients((list: string[]) => list.filter((c) => c !== peerId));
+    setPeerMediaElements((peerMediaElements) => {
+      return peerMediaElements.filter((element) => element.client !== peerId);
+    });
   };
 
   useEffect(() => {
@@ -139,22 +138,11 @@ export default function useWebRTC(
   }, [socket]);
 
   useEffect(() => {
-    console.log('RoomName:', roomName);
     if (socket && roomName) {
       const startCapture = async () => {
-        localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
+        localMediaStream.current = await getUserMedia();
 
-        addNewClient(LOCAL_VIDEO, () => {
-          console.log('addNewClient LOCAL_VIDEO:', LOCAL_VIDEO);
-          const localVideoElement = peerMediaElements.current[LOCAL_VIDEO];
-          if (localVideoElement) {
-            localVideoElement.volume = 0;
-            localVideoElement.srcObject = localMediaStream.current;
-          }
-        });
+        addNewClient(LOCAL_CLIENT, localMediaStream.current);
       };
 
       startCapture()
@@ -174,9 +162,5 @@ export default function useWebRTC(
     };
   }, [socket, roomName]);
 
-  const provideMediaRef = useCallback((id: string, node: HTMLMediaElement) => {
-    peerMediaElements.current[id] = node;
-  }, []);
-
-  return { clients, provideMediaRef };
+  return { clientsMedia: peerMediaElements, replaceLocalMedia };
 }

@@ -11,14 +11,14 @@ interface ModalProps {
 const Modal: FC<ModalProps> = ({ children, open, handleOnClose, header }) => {
   return (
     <div className={styles.modal} style={{ display: open ? 'block' : 'none' }}>
-      <div className={styles['modal-content']}>
-        <div className={styles['modal-header']}>
+      <div className={styles.content}>
+        <div className={styles.header}>
           <span onClick={handleOnClose} className={styles.close}>
             &times;
           </span>
           <h2>{header}</h2>
         </div>
-        <div className={styles['modal-body']}>{children}</div>
+        <div className={styles.body}>{children}</div>
       </div>
     </div>
   );
