@@ -7,7 +7,11 @@ interface Props {
 }
 
 const Participant: FC<Props> = ({ clientMedia }) => {
-  const handleVideo = (video: HTMLVideoElement | null, client: string, stream: MediaProvider) => {
+  const handleVideo = (
+    video: HTMLVideoElement | null,
+    client: string,
+    stream: MediaProvider | null
+  ) => {
     if (video) {
       video.srcObject = stream;
       video.autoplay = true;
@@ -20,7 +24,7 @@ const Participant: FC<Props> = ({ clientMedia }) => {
 
   return (
     <div className={styles.participant} key={clientMedia.client}>
-      <video ref={(video) => handleVideo(video, clientMedia.client, clientMedia.stream)}></video>
+      <video ref={(video) => handleVideo(video, clientMedia.client, clientMedia.stream)} />
     </div>
   );
 };

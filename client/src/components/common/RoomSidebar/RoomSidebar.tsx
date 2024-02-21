@@ -9,28 +9,33 @@ import {
   faMicrophone,
 } from '@fortawesome/free-solid-svg-icons';
 import useRoomContext from '@/src/hooks/useRoomContext';
-import { getVideoTrack } from '@/src/utils/mediaUtils';
+import { getAudioTrack, getVideoTrack } from '@/src/utils/mediaUtils';
 
 const RoomSidebar = () => {
-  const { localMedia, enableVideo } = useRoomContext();
+  const { localMedia, switchAudioOrVideo } = useRoomContext();
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
 
   const handleVideo = () => {
     const track = getVideoTrack(localMedia);
-    if (track) {
-      console.log('video track:', track);
-      if (videoEnabled) {
-        track.stop();
-      } else {
-        void enableVideo();
-      }
+    if (track && videoEnabled) {
+      track.stop();
+      void switchAudioOrVideo(audioEnabled, false);
+    } else {
+      void switchAudioOrVideo(audioEnabled, true);
     }
 
     setVideoEnabled(!videoEnabled);
   };
 
   const handleAudio = () => {
+    const track = getAudioTrack(localMedia);
+    if (track && audioEnabled) {
+      track.stop();
+      void switchAudioOrVideo(false, videoEnabled);
+    } else {
+      void switchAudioOrVideo(true, videoEnabled);
+    }
     setAudioEnabled(!audioEnabled);
   };
 
@@ -46,7 +51,6 @@ const RoomSidebar = () => {
           setVideoEnabled(true);
         }
       });
-      console.log('tracks:', tracks);
     }
   }, [localMedia]);
 

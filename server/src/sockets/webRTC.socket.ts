@@ -9,7 +9,8 @@ const webRTCHandler = (io: Server<IO>, socket: Socket<IO>) => {
   socket.on('JOIN', controller.joinRoom);
   socket.on('LEAVE', controller.leaveRoom);
 
-  socket.on('RELAY_SDP', controller.relaySDP);
+  socket.on('SEND_OFFER', controller.sendOffer);
+  socket.on('SEND_ANSWER', controller.sendAnswer);
   socket.on('RELAY_ICE', controller.relayICE);
 
   socket.on('disconnecting', controller.leaveRoom);

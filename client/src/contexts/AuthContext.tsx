@@ -1,5 +1,5 @@
 'use client';
-import { createContext, FC, ReactNode, useEffect, useState } from 'react';
+import React, { createContext, FC, ReactNode, useEffect, useState } from 'react';
 import { User } from '@/src/types';
 import AuthService from '@/src/services/AuthService';
 

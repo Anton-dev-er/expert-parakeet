@@ -50,14 +50,13 @@ class WebRTCController {
   }
 
   joinRoom = async ({ room: userRoomId }: { room: string }) => {
-    console.log('join room:');
+    console.log('join room');
     if (!this.socket) {
       console.log('joinRoom, this socket empty, roomId:', userRoomId);
       return;
     }
 
     const userRoom = userRoomService.getUserRoomByUserRoomId(userRoomId);
-    console.log('userRoomId:', userRoomId);
     if (!userRoom) {
       console.log('room doesnt not exists:', userRoomId);
       return;
@@ -77,10 +76,14 @@ class WebRTCController {
       this.socket.emit('ADD_PEER', { peerId: clientId, createOffer: true });
     });
     this.socket.join(userRoomId);
+
+    console.log('joined room');
+
     this.shareRoomsInfo();
   };
 
   leaveRoom = () => {
+    console.log('leave room');
     if (!this.socket) {
       console.log('leaveRoom, this socket empty');
       return;
@@ -99,19 +102,23 @@ class WebRTCController {
       this.socket.leave(roomId);
     });
 
+    console.log('left room');
+
     this.shareRoomsInfo();
   };
 
-  relaySDP = ({
-    peerId,
-    sessionDescription,
-  }: {
-    peerId: string;
-    sessionDescription: RTCSessionDescriptionInit;
-  }) => {
-    this.io.to(peerId).emit('SESSION_DESCRIPTION', {
+  sendOffer = ({ peerId, offer }: { peerId: string; offer: RTCSessionDescriptionInit }) => {
+    this.io.to(peerId).emit('OFFER', {
       peerId: this.socket.id,
-      sessionDescription,
+      offer,
+    });
+  };
+
+  sendAnswer = ({ peerId, answer }: { peerId: string; answer: RTCSessionDescriptionInit }) => {
+    console.log("sendAnswer");
+    this.io.to(peerId).emit('ANSWER', {
+      peerId: this.socket.id,
+      answer,
     });
   };
 

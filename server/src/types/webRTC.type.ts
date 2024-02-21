@@ -2,9 +2,13 @@ interface ServerToClientEvents {
   SHARE_ROOMS: (args: { rooms: string[] }) => void;
   REMOVE_PEER: (args: { peerId: string }) => void;
   ADD_PEER: (args: { peerId: string; createOffer: boolean }) => void;
-  SESSION_DESCRIPTION: (args: {
+  OFFER: (args: {
     peerId: string;
-    sessionDescription: RTCSessionDescriptionInit;
+    offer: RTCSessionDescriptionInit;
+  }) => void;
+  ANSWER: (args: {
+    peerId: string;
+    answer: RTCSessionDescriptionInit;
   }) => void;
   ICE_CANDIDATE: (args: { peerId: string; iceCandidate: string }) => void;
 }
@@ -12,7 +16,8 @@ interface ServerToClientEvents {
 interface ClientToServerEvents {
   JOIN: (arg: { room: string }) => void;
   LEAVE: () => void;
-  RELAY_SDP: (arg: { peerId: string; sessionDescription: RTCSessionDescriptionInit }) => void;
+  SEND_OFFER: (arg: { peerId: string; offer: RTCSessionDescriptionInit }) => void;
+  SEND_ANSWER: (arg: { peerId: string; answer: RTCSessionDescriptionInit }) => void;
   RELAY_ICE: (arg: { peerId: string; iceCandidate: string }) => void;
 }
 

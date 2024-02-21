@@ -19,7 +19,6 @@ const Input: FC<Input> = ({
   onChange,
   label = '',
   disabled = false,
-  placeholder = 'Type here...',
   type = 'text',
   validation,
 }) => {
@@ -52,7 +51,7 @@ const Input: FC<Input> = ({
   }, [value, validation?.message, validation?.function]);
 
   const handleOptions = () => {
-    let newClasses = [];
+    const newClasses = [];
 
     if (isFocus) {
       newClasses.push(styles.focus);

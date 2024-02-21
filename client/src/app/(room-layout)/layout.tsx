@@ -12,11 +12,11 @@ import useWebRTC from '@/src/hooks/useWebRTC';
 export default function RoomLayout({ children }: { children: React.ReactNode }) {
   const params = useParams<{ userRoomId: string }>();
   const { socket } = useSocketContext();
-  const { clientsMedia, replaceLocalMedia } = useWebRTC(params?.userRoomId || '', socket);
+  const { clientsMedia, replaceLocalStream } = useWebRTC(params?.userRoomId || '', socket);
 
   return (
     <main className={styles.layout}>
-      <RoomContextProvider clientsMedia={clientsMedia} replaceLocalMedia={replaceLocalMedia}>
+      <RoomContextProvider clientsMedia={clientsMedia} replaceLocalStream={replaceLocalStream}>
         <Sidebar />
         {children}
         <RoomSidebar />

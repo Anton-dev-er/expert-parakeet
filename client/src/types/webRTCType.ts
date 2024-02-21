@@ -2,7 +2,7 @@ const LOCAL_CLIENT = 'LOCAL_CLIENT';
 
 type PeerMediaElement = {
   client: string;
-  stream: MediaStream;
+  stream: MediaStream | null;
 };
 
 type PeerConnection = {

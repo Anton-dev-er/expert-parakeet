@@ -1,13 +1,12 @@
 'use client';
 import React, { createContext, FC, ReactNode, useEffect, useState } from 'react';
 import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
-import { getUserMedia } from '@/src/utils/mediaUtils';
 
 interface RoomContextType {
   localMedia: MediaStream | null;
   remoteClientsMedia: PeerMediaElement[];
   populateContext: (clientsMedia: PeerMediaElement[]) => void;
-  enableVideo: () => Promise<void>;
+  switchAudioOrVideo: (audio: boolean, video: boolean) => Promise<void>;
 }
 
 export const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -15,28 +14,31 @@ export const RoomContext = createContext<RoomContextType>({} as RoomContextType)
 export const RoomContextProvider: FC<{
   children: ReactNode;
   clientsMedia: PeerMediaElement[];
-  replaceLocalMedia: () => Promise<void>;
-}> = ({ children, clientsMedia, replaceLocalMedia }) => {
+  replaceLocalStream: (audio: boolean, video: boolean) => Promise<void>;
+}> = ({ children, clientsMedia, replaceLocalStream }) => {
   const [localMedia, setLocalMedia] = useState<MediaStream | null>(null);
   const [remoteClientsMedia, setRemoteClientsMedia] = useState<PeerMediaElement[]>([]);
 
   useEffect(() => {
+    console.log('RoomContext, clientsMedia:', clientsMedia);
     populateContext(clientsMedia);
   }, [clientsMedia]);
 
   const populateContext = (clientsMedia: PeerMediaElement[]) => {
+    const remoteClients: PeerMediaElement[] = [];
     clientsMedia.forEach((client) => {
       if (client.client === LOCAL_CLIENT) {
         setLocalMedia(client.stream);
       } else {
-        setRemoteClientsMedia((prevState) => [...prevState, client]);
+        remoteClients.push(client);
       }
     });
+    setRemoteClientsMedia(remoteClients);
   };
 
-  const enableVideo = async () => {
+  const switchAudioOrVideo = async (audio: boolean, video: boolean) => {
     // we can not directly enable video track, we need to recreate whole stream
-    await replaceLocalMedia();
+    await replaceLocalStream(audio, video);
   };
 
   return (
@@ -45,7 +47,7 @@ export const RoomContextProvider: FC<{
         localMedia,
         remoteClientsMedia,
         populateContext,
-        enableVideo,
+        switchAudioOrVideo,
       }}
     >
       {children}

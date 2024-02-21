@@ -22,12 +22,17 @@ const getVideoTrack = (media: MediaStream | null): MediaStreamTrack | null => {
   return track.length ? track[0] : null;
 };
 
-const getUserMedia = async () => {
-  return await navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true,
-  });
+const getUserMedia = async (audio: boolean, video: boolean) => {
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: audio,
+      video: video,
+    });
+  } catch {
+    return null;
+  }
+
 };
 
 
-export { getAudioTrack, getVideoTrack, getUserMedia};
+export { getAudioTrack, getVideoTrack, getUserMedia };

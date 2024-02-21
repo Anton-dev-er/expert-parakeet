@@ -10,7 +10,7 @@ interface Button {
 
 const Button: FC<Button> = ({ children, type, onClick, disabled }) => {
   const handleOptions = () => {
-    let newClasses = [];
+    const newClasses = [];
 
     if (type) {
       if (type === 'transparent') {
