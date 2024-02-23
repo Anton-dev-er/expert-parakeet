@@ -68,7 +68,7 @@ class AuthService {
     const userRepo = await userService.getRepo();
 
     const userData = tokenService.validateRefreshToken(refreshToken);
-    const userLogin = await userLoginRepo.findOne({ where: { refreshToken } });
+    const userLogin = await userLoginRepo.findOneBy({ user: { id: userData.payload.id } });
     if (!userData || !userLogin) {
       throw ApiError.forbidden();
     }

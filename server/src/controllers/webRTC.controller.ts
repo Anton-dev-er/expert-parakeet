@@ -1,6 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { IO } from '../types/webRTC.type';
 import userRoomService from '../services/user-room.service';
+import UserRoomEntity from '../entities/user-room.entity';
+import RoomDto from '../dtos/room.dto';
 
 // todo move WebRTCHelper to services
 class WebRTCHelper {
@@ -36,6 +38,7 @@ class WebRTCController {
   private readonly io: Server<IO>;
   private readonly socket: Socket<IO>;
   private readonly helper: WebRTCHelper;
+  private roomConnections: { [key: string]: RoomDto } = {};
 
   constructor(io: Server<IO>, socket: Socket<IO>) {
     this.io = io;
@@ -45,8 +48,8 @@ class WebRTCController {
   }
 
   async shareRoomsInfo() {
-    const rooms: string[] = await this.helper.getValidClientRooms();
-    this.io.emit('SHARE_ROOMS', { rooms });
+    // const rooms: string[] = await this.helper.getValidClientRooms();
+    this.io.emit('SHARE_ROOMS', { rooms: Object.values(this.roomConnections || {}) });
   }
 
   joinRoom = async ({ room: userRoomId }: { room: string }) => {
@@ -56,19 +59,25 @@ class WebRTCController {
       return;
     }
 
-    const userRoom = userRoomService.getUserRoomByUserRoomId(userRoomId);
+    const userRoom: UserRoomEntity = await userRoomService.getUserRoomByUserRoomId(userRoomId);
     if (!userRoom) {
-      console.log('room doesnt not exists:', userRoomId);
+      console.log('room doesnt not exists', userRoomId);
       return;
     }
+
+    const clients = this.helper.getClientsByRoomId(userRoomId);
+    if (!userRoom.is_owner && clients.length === 0) {
+      console.log('user is not owner', userRoomId);
+      return;
+    }
+
+    this.roomConnections[userRoomId] = new RoomDto(userRoom);
 
     const { rooms } = this.socket;
     if (Array.from(rooms).includes(userRoomId)) {
       console.warn('Already joined to this room');
       return;
     }
-
-    const clients = this.helper.getClientsByRoomId(userRoomId);
 
     clients.forEach((clientId) => {
       this.socket.to(clientId).emit('ADD_PEER', { peerId: this.socket.id, createOffer: false });
@@ -100,6 +109,9 @@ class WebRTCController {
       });
 
       this.socket.leave(roomId);
+      if (roomId in this.roomConnections) {
+        delete this.roomConnections[roomId];
+      }
     });
 
     console.log('left room');
@@ -115,7 +127,7 @@ class WebRTCController {
   };
 
   sendAnswer = ({ peerId, answer }: { peerId: string; answer: RTCSessionDescriptionInit }) => {
-    console.log("sendAnswer");
+    console.log('sendAnswer');
     this.io.to(peerId).emit('ANSWER', {
       peerId: this.socket.id,
       answer,

@@ -11,18 +11,22 @@ import http from 'http';
 
 dotenv.config();
 
+const { CLIENT_URL, CLIENT_URL_LOCAL } = process.env;
+
+const allowedOrigin = [CLIENT_URL, CLIENT_URL_LOCAL];
+
 const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5555;
 const io = new Server<IO>(server, {
   cors: {
-    origin: 'https://watchy.space',
+    origin: allowedOrigin,
   },
 });
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: 'https://watchy.space' }));
+app.use(cors({ credentials: true, origin: allowedOrigin }));
 app.use('/api', router);
 
 // Error handler should be last

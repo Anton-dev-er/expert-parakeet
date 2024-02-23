@@ -42,7 +42,7 @@ class UserRoomService {
     });
   }
 
-  async getUserRoomByUserRoomId(userRoomId: string) {
+  async getUserRoomByUserRoomId(userRoomId: string): Promise<UserRoomEntity> {
     const repo = await this.getRepo();
 
     try {
