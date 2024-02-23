@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "start": "next dev",
+    "dev": "next dev && set NEXT_PUBLIC_ENV=dev",
+    "start": "next start && set NEXT_PUBLIC_ENV=prod",
+    "deploy": "vercel && vercel --prod",
     "build": "next build",
-    "prod": "next start",
     "lint": "next lint"
   },
   "dependencies": {

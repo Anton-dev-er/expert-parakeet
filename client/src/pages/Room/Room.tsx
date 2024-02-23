@@ -10,7 +10,9 @@ const Room = () => {
   const { localMedia, remoteClientsMedia } = useRoomContext();
 
   const handleClientMedia = () => {
-    return [{ stream: localMedia, client: LOCAL_CLIENT }, ...remoteClientsMedia];
+    // for build purposes
+    const clientsMedia = remoteClientsMedia || []
+    return [{ stream: localMedia, client: LOCAL_CLIENT }, ...clientsMedia];
   };
 
   return (

@@ -7,22 +7,40 @@ import UserRoleEntity from './entities/user-role.entity';
 import UserLoginEntity from './entities/user-login.entity';
 import RoomEntity from './entities/room.entity';
 import UserRoomEntity from './entities/user-room.entity';
+import { AuthTypes, Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector';
 
 dotenv.config();
-const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
+const { TYPEORM_HOST, TYPEORM_USERNAME, TYPEORM_PASSWORD } = process.env;
 
-// todo check if updatedAt updating
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: DB_HOST,
-  port: parseInt(DB_PORT || '5432'),
-  username: DB_USERNAME,
-  password: DB_PASSWORD,
-  database: DB_DATABASE,
+let dataSource = null;
+const connect = async () => {
+  // to not initialize it every time, cause google sql cloud kinda slow
+  if (dataSource) {
+    return dataSource;
+  }
+  const connector = new Connector();
+  const clientOpts = await connector.getOptions({
+    instanceConnectionName: TYPEORM_HOST,
+    authType: 'IAM' as AuthTypes,
+    ipType: 'PUBLIC' as IpAddressTypes,
+  });
 
-  synchronize: true,
-  logging: false,
-  entities: [UserEntity, RoleEntity, UserRoleEntity, UserLoginEntity, RoomEntity, UserRoomEntity],
-  migrations: [__dirname + '/migration/*.ts'],
-  subscribers: [],
-});
+  // todo check if updatedAt updating
+  dataSource = new DataSource({
+    type: 'postgres',
+    username: TYPEORM_USERNAME,
+    password: TYPEORM_PASSWORD,
+    extra: clientOpts,
+    synchronize: true,
+    logging: true,
+    entities: [UserEntity, RoleEntity, UserRoleEntity, UserLoginEntity, RoomEntity, UserRoomEntity],
+    migrations: [__dirname + '/migration/*.ts'],
+    subscribers: [],
+  });
+
+  await dataSource.initialize();
+
+  return dataSource;
+};
+
+export default connect;

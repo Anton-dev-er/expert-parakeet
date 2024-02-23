@@ -7,9 +7,7 @@ import onConnection from './src/sockets';
 import { Server } from 'socket.io';
 import { IO } from './src/types/webRTC.type';
 import dotenv from 'dotenv';
-import { AppDataSource } from './src/data-source';
 import http from 'http';
-
 
 dotenv.config();
 
@@ -18,14 +16,13 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5555;
 const io = new Server<IO>(server, {
   cors: {
-    origin: ['*'],
-    methods: ['GET', 'POST'],
+    origin: 'https://watchy.space',
   },
 });
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
+app.use(cors({ credentials: true, origin: 'https://watchy.space' }));
 app.use('/api', router);
 
 // Error handler should be last
@@ -37,7 +34,6 @@ io.on('connection', (socket) => {
 
 const letsGo = async () => {
   try {
-    await AppDataSource.initialize();
     server.listen(PORT, () => console.log(`localhost:${PORT}`));
   } catch (e) {
     console.log(e);

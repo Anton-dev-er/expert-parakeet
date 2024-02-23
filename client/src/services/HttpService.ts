@@ -1,9 +1,8 @@
 import AuthService from '@/src/services/AuthService';
+import { BASE_URL } from '@/src/utils';
 
 // todo move to env
-const BASE_URL = 'http://localhost:5555';
-
-class Http {
+export default class HttpService {
   private readonly baseUrl: string;
   private readonly useAccessToken: boolean;
 
@@ -73,6 +72,3 @@ class Http {
     throw new Error((await response.json()).message);
   }
 }
-
-export { BASE_URL };
-export default Http;
