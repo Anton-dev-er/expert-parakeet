@@ -17,4 +17,8 @@
   &:has(div) p {
     margin-left: 1em;
   }
+
+  &.center {
+    justify-content: center;
+  }
 }

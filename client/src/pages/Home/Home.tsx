@@ -1,12 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import List from '@/src/components/UI/List/List';
 import styles from './Home.module.scss';
-import { Item } from '@/src/components/UI/List/types';
-import { useRouter } from 'next/navigation';
 import { ACTIONS } from '@/src/contexts/SocketContext';
 import useSocketContext from '@/src/hooks/useSocketContext';
-import { roomHref } from '@/src/utils/roomUtils';
 import Hero from '@/src/pages/Home/Hero/Hero';
 import { RoomResponse } from '@/src/types/response/RoomResponse';
 import RoomList from '@/src/components/UI/RoomList/RoomList';

@@ -3,4 +3,8 @@
 .layout {
   display: grid;
   grid-template-columns: 2fr 7fr 3fr;
+
+  @media only screen and (max-width: 768px) {
+    grid-template-columns: 5em 1fr;
+  }
 }

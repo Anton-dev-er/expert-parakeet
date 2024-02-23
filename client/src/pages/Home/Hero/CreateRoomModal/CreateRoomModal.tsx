@@ -4,7 +4,6 @@ import Modal from '@/src/components/UI/Modal/Modal';
 import Button from '@/src/components/UI/Button/Button';
 import Input from '@/src/components/UI/Input/Input';
 import { useRouter } from 'next/navigation';
-import { v4 } from 'uuid';
 import useAuthContext from '@/src/hooks/useAuthContext';
 import RoomService from '@/src/services/RoomService';
 import { roomHref, isValidRoomName } from '@/src/utils/roomUtils';

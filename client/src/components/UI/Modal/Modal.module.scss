@@ -24,6 +24,12 @@
   opacity: 1;
   box-shadow: -1px 1px 4px 0px rgb(204 203 203 / 75%);
   border-radius: 1em;
+
+  @media only screen and (max-width: 768px) {
+    & {
+      width: calc(100% - 4em);
+    }
+  }
 }
 
 .header {

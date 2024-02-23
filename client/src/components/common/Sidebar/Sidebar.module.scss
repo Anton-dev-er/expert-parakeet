@@ -24,6 +24,11 @@
     height: 3em;
     width: 3em;
     margin-bottom: 3em;
-    margin-left: 1em;
   }
+}
+
+.logout {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
 }

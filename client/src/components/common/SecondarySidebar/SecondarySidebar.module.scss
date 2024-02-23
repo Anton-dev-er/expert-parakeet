@@ -1,3 +1,27 @@
 .secondarySidebar {
   margin: 2em 2em 2em 0;
+
+
+  @media only screen and (max-width: 768px) {
+    & {
+      margin: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      overflow-y: auto;
+    }
+  }
+}
+
+.mobileArrow {
+  position: fixed;
+  right: 0;
+  z-index: 1;
+
+  &.expand {
+    transform: rotate(180deg);
+  }
 }

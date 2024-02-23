@@ -14,7 +14,20 @@
     color: $white;
     margin-bottom: 0.5em;
   }
+
   button {
     margin-right: 0.5em;
+  }
+
+  @media only screen and (max-width: 768px) {
+    & {
+      height: unset;
+      padding: 1em;
+    }
+
+    button {
+      margin-bottom: 0.5em;
+      width: 100%;
+    }
   }
 }
