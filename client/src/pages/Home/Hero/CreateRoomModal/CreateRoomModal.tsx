@@ -29,12 +29,12 @@ const CreateRoomModal = () => {
 
   const handleCreateRoom = async () => {
     if (!roomName || !auth || !user) {
-      return push(roomHref(v4()));
+      return;
     }
     const roomRoute = formatRoomName(roomName);
     const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true);
     if (room) {
-      push(roomHref(room.id));
+      push(roomHref(roomRoute, room.id));
     }
   };
 

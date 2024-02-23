@@ -26,8 +26,11 @@ const Input: FC<Input> = ({
   const [value, setValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement> ) => {
+    const value = e.target.value;
+    if (value) {
+      setIsFocus(true);
+    }
     onChange(value);
     setValue(value);
   };

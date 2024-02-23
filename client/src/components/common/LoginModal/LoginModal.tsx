@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Modal from '@/src/components/UI/Modal/Modal';
+import Input from '@/src/components/UI/Input/Input';
 import Button from '@/src/components/UI/Button/Button';
 import useAuthContext from '@/src/hooks/useAuthContext';
 
@@ -37,28 +38,25 @@ const LoginModal = () => {
         header={switchToRegister ? 'Register' : 'Log in'}
       >
         <div>
-          <input
-            autoComplete="one-time-code"
-            type="email"
-            placeholder="email"
-            onChange={(e) => {
-              setEmail(e.target.value);
+          <Input
+            id="email"
+            label="Email"
+            onChange={(value) => {
+              setEmail(value);
             }}
           />
-          <input
-            autoComplete="one-time-code"
+          <Input
+            id="password"
+            label="Password"
             type="password"
-            placeholder="password"
-            onChange={(e) => {
-              setPassword(e.target.value);
+            onChange={(value) => {
+              setPassword(value);
             }}
           />
-          <button onClick={handleLogin}>{switchToRegister ? 'Register' : 'Log in'}</button>
-        </div>
-        <div>
-          <button onClick={() => setSwitchToRegister(!switchToRegister)}>
+          <Button onClick={handleLogin}>{switchToRegister ? 'Register' : 'Log in'}</Button>
+          <Button type="outlined" onClick={() => setSwitchToRegister(!switchToRegister)}>
             {switchToRegister ? 'Go to log in' : 'Go to register'}
-          </button>
+          </Button>
         </div>
       </Modal>
     </div>

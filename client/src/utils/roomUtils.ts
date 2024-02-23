@@ -1,5 +1,5 @@
-const roomHref = (userRoomId: string) => {
-  return `/room/${userRoomId}`;
+const roomHref = (roomUrl: string, userRoomId: string) => {
+  return `/room/${roomUrl}/${userRoomId}`;
 };
 
 const isValidRoomName = (str: string) => {

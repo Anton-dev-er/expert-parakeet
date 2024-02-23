@@ -8,11 +8,11 @@ import { ACTIONS } from '@/src/contexts/SocketContext';
 import useSocketContext from '@/src/hooks/useSocketContext';
 import { roomHref } from '@/src/utils/roomUtils';
 import Hero from '@/src/pages/Home/Hero/Hero';
+import { RoomResponse } from '@/src/types/response/RoomResponse';
+import RoomList from '@/src/components/UI/RoomList/RoomList';
 
 const Home = () => {
-  const [rooms, setRooms] = useState<string[]>([]);
-  const [listItems, setListItems] = useState<Item[]>([]);
-  const { push } = useRouter();
+  const [rooms, setRooms] = useState<RoomResponse[]>([]);
   const { socket } = useSocketContext();
 
   useEffect(() => {
@@ -28,17 +28,6 @@ const Home = () => {
     };
   }, [socket]);
 
-  useEffect(() => {
-    const items: Item[] = rooms.map((room): Item => {
-      return {
-        id: room,
-        content: `Room name: ${room}`,
-        handleOnClick: () => push(roomHref(room)),
-      };
-    });
-    setListItems(items);
-  }, [rooms]);
-
   return (
     <div className={styles.home}>
       <Hero />
@@ -46,7 +35,7 @@ const Home = () => {
       {/*todo separate in component*/}
       <div className={styles.home}>
         <h2>Global public rooms</h2>
-        {listItems.length ? <List items={listItems} /> : <h3>Rooms not found</h3>}
+        {rooms.length ? <RoomList rooms={rooms} /> : <h3>Rooms not found</h3>}
       </div>
     </div>
   );
