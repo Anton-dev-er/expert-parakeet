@@ -9,6 +9,8 @@ import '@/src/styles/globals.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { AuthContextProvider } from '@/src/contexts/AuthContext';
 import { SocketContextProvider } from '@/src/contexts/SocketContext';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 
 config.autoAddCss = false;
 const inter = Inter({ subsets: ['latin'] });
@@ -27,7 +29,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} ${styles.body}`}>
         <AuthContextProvider>
-          <SocketContextProvider>{children}</SocketContextProvider>
+          <SocketContextProvider>
+            {children}
+            <SpeedInsights />
+            <Analytics />
+          </SocketContextProvider>
         </AuthContextProvider>
       </body>
     </html>

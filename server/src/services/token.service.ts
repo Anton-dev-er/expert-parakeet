@@ -49,7 +49,7 @@ class TokenService {
   }
 
   async saveToken(userId: string, refreshToken: string) {
-    const userLoginRepo = userLoginService.repo;
+    const userLoginRepo = await userLoginService.getRepo();
     const userLogin = await userLoginRepo.findOne({
       where: { user: { id: userId } },
     });
@@ -58,7 +58,7 @@ class TokenService {
   }
 
   async removeToken(userId: string) {
-    const userLoginRepo = userLoginService.repo;
+    const userLoginRepo = await userLoginService.getRepo();
     const userLogin = await userLoginRepo.findOne({
       where: { user: { id: userId } },
     });

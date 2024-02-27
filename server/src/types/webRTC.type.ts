@@ -1,15 +1,11 @@
+import RoomDto from '../dtos/room.dto';
+
 interface ServerToClientEvents {
-  SHARE_ROOMS: (args: { rooms: string[] }) => void;
+  SHARE_ROOMS: (args: { rooms: RoomDto[] }) => void;
   REMOVE_PEER: (args: { peerId: string }) => void;
   ADD_PEER: (args: { peerId: string; createOffer: boolean }) => void;
-  OFFER: (args: {
-    peerId: string;
-    offer: RTCSessionDescriptionInit;
-  }) => void;
-  ANSWER: (args: {
-    peerId: string;
-    answer: RTCSessionDescriptionInit;
-  }) => void;
+  OFFER: (args: { peerId: string; offer: RTCSessionDescriptionInit }) => void;
+  ANSWER: (args: { peerId: string; answer: RTCSessionDescriptionInit }) => void;
   ICE_CANDIDATE: (args: { peerId: string; iceCandidate: string }) => void;
 }
 
@@ -21,18 +17,15 @@ interface ClientToServerEvents {
   RELAY_ICE: (arg: { peerId: string; iceCandidate: string }) => void;
 }
 
-interface InterServerEvents {
-}
+interface InterServerEvents {}
 
-interface SocketData {
-}
+interface SocketData {}
 
 interface IO
   extends ServerToClientEvents,
     ClientToServerEvents,
     InterServerEvents,
     SocketData,
-    SocketData {
-}
+    SocketData {}
 
 export { ServerToClientEvents, ClientToServerEvents, SocketData, InterServerEvents, IO };

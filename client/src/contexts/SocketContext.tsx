@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, FC, ReactNode, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
-import { BASE_URL } from '@/src/http';
+import { BASE_URL } from '@/src/utils';
 
 const options = {
   'force new connection': true,

@@ -1,3 +1,4 @@
+'use client';
 import React, { FC } from 'react';
 import styles from './List.module.scss';
 import Item from '@/src/components/UI/List/Item/Item';
@@ -7,7 +8,7 @@ const List: FC<List> = ({ items }) => {
   return (
     <ul className={styles.list}>
       {items.map((item) => (
-        <Item key={item.content} {...item} />
+        <Item key={item.id || item.content} {...item} />
       ))}
     </ul>
   );

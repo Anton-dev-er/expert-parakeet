@@ -4,7 +4,6 @@ import Modal from '@/src/components/UI/Modal/Modal';
 import Button from '@/src/components/UI/Button/Button';
 import Input from '@/src/components/UI/Input/Input';
 import { useRouter } from 'next/navigation';
-import { v4 } from 'uuid';
 import useAuthContext from '@/src/hooks/useAuthContext';
 import RoomService from '@/src/services/RoomService';
 import { roomHref, isValidRoomName } from '@/src/utils/roomUtils';
@@ -29,12 +28,12 @@ const CreateRoomModal = () => {
 
   const handleCreateRoom = async () => {
     if (!roomName || !auth || !user) {
-      return push(roomHref(v4()));
+      return;
     }
     const roomRoute = formatRoomName(roomName);
     const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true);
     if (room) {
-      push(roomHref(room.id));
+      push(roomHref(roomRoute, room.id));
     }
   };
 

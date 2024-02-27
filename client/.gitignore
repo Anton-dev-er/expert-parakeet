@@ -1,7 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-.idea
-
 ### Client dependencies
 node_modules
 .idea
@@ -25,3 +23,4 @@ env*.local
 *.tsbuildinfo
 next-env.d.ts
 .DS_store
+.vercel

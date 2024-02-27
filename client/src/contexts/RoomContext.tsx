@@ -20,7 +20,6 @@ export const RoomContextProvider: FC<{
   const [remoteClientsMedia, setRemoteClientsMedia] = useState<PeerMediaElement[]>([]);
 
   useEffect(() => {
-    console.log('RoomContext, clientsMedia:', clientsMedia);
     populateContext(clientsMedia);
   }, [clientsMedia]);
 

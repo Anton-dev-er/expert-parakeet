@@ -25,7 +25,7 @@ class AuthService {
   }
 
   async registration(email: string, password: string) {
-    const userLoginRepo = userLoginService.repo;
+    const userLoginRepo = await userLoginService.getRepo();
     const user = await userLoginRepo.findOne({ where: { email } });
     if (user) {
       throw ApiError.BadRequest(`${email} already exists`);
@@ -41,8 +41,8 @@ class AuthService {
   }
 
   async login(email: string, password: string) {
-    const userLoginRepo = userLoginService.repo;
-    const userRepo = userService.repo;
+    const userLoginRepo = await userLoginService.getRepo();
+    const userRepo = await userService.getRepo();
 
     const userLogin = await userLoginRepo.findOne({
       where: { email },
@@ -62,13 +62,13 @@ class AuthService {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw ApiError.UnauthorizedError();
+      throw ApiError.forbidden();
     }
-    const userLoginRepo = userLoginService.repo;
-    const userRepo = userService.repo;
+    const userLoginRepo = await userLoginService.getRepo();
+    const userRepo = await userService.getRepo();
 
     const userData = tokenService.validateRefreshToken(refreshToken);
-    const userLogin = await userLoginRepo.findOne({ where: { refreshToken } });
+    const userLogin = await userLoginRepo.findOneBy({ user: { id: userData.payload.id } });
     if (!userData || !userLogin) {
       throw ApiError.forbidden();
     }
