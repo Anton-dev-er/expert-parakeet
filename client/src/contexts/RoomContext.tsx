@@ -3,9 +3,8 @@ import React, { createContext, FC, ReactNode, useEffect, useState } from 'react'
 import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
 
 interface RoomContextType {
-  localMedia: MediaStream | null;
+  localClientMedia: PeerMediaElement;
   remoteClientsMedia: PeerMediaElement[];
-  populateContext: (clientsMedia: PeerMediaElement[]) => void;
   switchAudioOrVideo: (audio: boolean, video: boolean) => Promise<void>;
 }
 
@@ -16,7 +15,9 @@ export const RoomContextProvider: FC<{
   clientsMedia: PeerMediaElement[];
   replaceLocalStream: (audio: boolean, video: boolean) => Promise<void>;
 }> = ({ children, clientsMedia, replaceLocalStream }) => {
-  const [localMedia, setLocalMedia] = useState<MediaStream | null>(null);
+  const [localClientMedia, setLocalClientMedia] = useState<PeerMediaElement>(
+    {} as PeerMediaElement
+  );
   const [remoteClientsMedia, setRemoteClientsMedia] = useState<PeerMediaElement[]>([]);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export const RoomContextProvider: FC<{
     const remoteClients: PeerMediaElement[] = [];
     clientsMedia.forEach((client) => {
       if (client.client === LOCAL_CLIENT) {
-        setLocalMedia(client.stream);
+        setLocalClientMedia(client);
       } else {
         remoteClients.push(client);
       }
@@ -43,9 +44,8 @@ export const RoomContextProvider: FC<{
   return (
     <RoomContext.Provider
       value={{
-        localMedia,
+        localClientMedia,
         remoteClientsMedia,
-        populateContext,
         switchAudioOrVideo,
       }}
     >

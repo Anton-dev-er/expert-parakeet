@@ -59,8 +59,8 @@ export default function useWebRTC(
   };
 
   const replaceLocalStream = async (audio: boolean, video: boolean) => {
-    console.log('replaceLocalStream, audio:', audio, ', video:', video);
     const newLocalMedia = await getUserMedia(audio, video);
+    console.log('replaceLocalStream, audio:', audio, ', video:', video);
     localMediaStream.current = newLocalMedia;
     addNewClient(LOCAL_CLIENT, newLocalMedia);
     Object.entries(peerConnections.current).forEach(([peerId, connection]) => {

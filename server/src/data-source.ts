@@ -32,7 +32,7 @@ const connect = async () => {
     password: TYPEORM_PASSWORD,
     extra: clientOpts,
     synchronize: true,
-    logging: true,
+    logging: false,
     entities: [UserEntity, RoleEntity, UserRoleEntity, UserLoginEntity, RoomEntity, UserRoomEntity],
     migrations: [__dirname + '/migration/*.ts'],
     subscribers: [],

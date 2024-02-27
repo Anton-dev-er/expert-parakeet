@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Participant: FC<Props> = ({ clientMedia }) => {
-  console.log('clientMedia:', clientMedia);
+  console.warn('Participant re rendering, clientMedia:', clientMedia.client);
   const handleVideo = ({ video, stream, client }: HandleVideo) => {
     if (video) {
       video.srcObject = stream;
@@ -26,7 +26,7 @@ const Participant: FC<Props> = ({ clientMedia }) => {
   };
 
   return (
-    <div className={styles.participant} key={clientMedia.client}>
+    <div className={styles.participant}>
       <video
         ref={(video) =>
           handleVideo({ video, client: clientMedia.client, stream: clientMedia.stream })
@@ -36,4 +36,4 @@ const Participant: FC<Props> = ({ clientMedia }) => {
   );
 };
 
-export default Participant;
+export default React.memo(Participant);

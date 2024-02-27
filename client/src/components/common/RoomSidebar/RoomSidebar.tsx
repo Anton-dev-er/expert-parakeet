@@ -12,12 +12,12 @@ import useRoomContext from '@/src/hooks/useRoomContext';
 import { getAudioTrack, getVideoTrack } from '@/src/utils/mediaUtils';
 
 const RoomSidebar = () => {
-  const { localMedia, switchAudioOrVideo } = useRoomContext();
+  const { localClientMedia, switchAudioOrVideo } = useRoomContext();
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
 
   const handleVideo = () => {
-    const track = getVideoTrack(localMedia);
+    const track = getVideoTrack(localClientMedia.stream);
     if (track && videoEnabled) {
       track.stop();
       void switchAudioOrVideo(audioEnabled, false);
@@ -29,7 +29,7 @@ const RoomSidebar = () => {
   };
 
   const handleAudio = () => {
-    const track = getAudioTrack(localMedia);
+    const track = getAudioTrack(localClientMedia.stream);
     if (track && audioEnabled) {
       track.stop();
       void switchAudioOrVideo(false, videoEnabled);
@@ -40,8 +40,8 @@ const RoomSidebar = () => {
   };
 
   useEffect(() => {
-    if (localMedia) {
-      const tracks = localMedia.getTracks();
+    if (localClientMedia.stream) {
+      const tracks = localClientMedia.stream.getTracks();
       tracks.forEach((track) => {
         if (track.kind === 'audio') {
           setAudioEnabled(true);
@@ -52,7 +52,7 @@ const RoomSidebar = () => {
         }
       });
     }
-  }, [localMedia]);
+  }, [localClientMedia.stream]);
 
   return (
     <div className={styles.roomSidebar}>
