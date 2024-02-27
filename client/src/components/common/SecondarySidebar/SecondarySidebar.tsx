@@ -27,7 +27,6 @@ const SecondarySidebar = () => {
     }
   }, [isMobile]);
 
-  console.log('isExpand:', isExpand);
 
   return (
     <>

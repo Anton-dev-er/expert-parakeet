@@ -39,7 +39,6 @@ class HttpService {
 
     if (response.status === 401) {
       const tokens = await AuthService.refresh();
-      console.log('refresh tokens:', tokens);
       localStorage.setItem('token', tokens.accessToken);
       return await this.fetch(input, init);
     }

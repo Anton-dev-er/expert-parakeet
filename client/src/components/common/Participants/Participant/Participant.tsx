@@ -2,16 +2,19 @@ import React, { FC } from 'react';
 import styles from './Participant.module.scss';
 import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
 
+type HandleVideo = {
+  video: HTMLVideoElement | null;
+  client: string;
+  stream: MediaProvider | null;
+};
+
 interface Props {
   clientMedia: PeerMediaElement;
 }
 
 const Participant: FC<Props> = ({ clientMedia }) => {
-  const handleVideo = (
-    video: HTMLVideoElement | null,
-    client: string,
-    stream: MediaProvider | null
-  ) => {
+  console.log('clientMedia:', clientMedia);
+  const handleVideo = ({ video, stream, client }: HandleVideo) => {
     if (video) {
       video.srcObject = stream;
       video.autoplay = true;
@@ -24,7 +27,11 @@ const Participant: FC<Props> = ({ clientMedia }) => {
 
   return (
     <div className={styles.participant} key={clientMedia.client}>
-      <video ref={(video) => handleVideo(video, clientMedia.client, clientMedia.stream)} />
+      <video
+        ref={(video) =>
+          handleVideo({ video, client: clientMedia.client, stream: clientMedia.stream })
+        }
+      />
     </div>
   );
 };

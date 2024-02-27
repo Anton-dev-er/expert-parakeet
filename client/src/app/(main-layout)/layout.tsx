@@ -2,7 +2,6 @@ import React from 'react';
 import Sidebar from '@/src/components/common/Sidebar/Sidebar';
 import SecondarySidebar from '@/src/components/common/SecondarySidebar/SecondarySidebar';
 import styles from './layout.module.scss';
-import useCheckMobileScreen from '@/src/hooks/useCheckMobileScreen';
 
 export default function MainLayout({
   children,
