@@ -1,49 +1,20 @@
 import { Server, Socket } from 'socket.io';
-import { IO } from '../types/webRTC.type';
-import userRoomService from '../services/user-room.service';
-import UserRoomEntity from '../entities/user-room.entity';
-import RoomDto from '../dtos/room.dto';
-
-// todo move WebRTCHelper to services
-class WebRTCHelper {
-  private readonly io: Server<IO>;
-  private readonly socket: Socket<IO>;
-
-  constructor(io: Server<IO>, socket: Socket<IO>) {
-    this.io = io;
-    this.socket = socket;
-  }
-
-  getValidClientRooms = async (): Promise<string[]> => {
-    const fetchedSockets = (await this.io.fetchSockets()) || [];
-
-    const roomNames: string[] = [];
-    fetchedSockets.forEach((socket) => {
-      const rooms = socket.rooms;
-      rooms.forEach((room) => {
-        if (room !== socket.id) {
-          roomNames.push(room);
-        }
-      });
-    });
-    return roomNames;
-  };
-
-  getClientsByRoomId = (roomId: string) => {
-    return Array.from(this.io.sockets.adapter.rooms.get(roomId) || []);
-  };
-}
+import { IO } from '../../types/webRTC.type';
+import userRoomService from '../../services/user-room.service';
+import UserRoomEntity from '../../entities/user-room.entity';
+import RoomDto from '../../dtos/room.dto';
+import SocketService from '../services/socket.service';
 
 class WebRTCController {
   private readonly io: Server<IO>;
   private readonly socket: Socket<IO>;
-  private readonly helper: WebRTCHelper;
+  private readonly helper: SocketService;
   private roomConnections: { [key: string]: RoomDto } = {};
 
   constructor(io: Server<IO>, socket: Socket<IO>) {
     this.io = io;
     this.socket = socket;
-    this.helper = new WebRTCHelper(io, socket);
+    this.helper = new SocketService(io, socket);
     this.shareRoomsInfo();
   }
 
@@ -86,7 +57,7 @@ class WebRTCController {
     });
     this.socket.join(userRoomId);
 
-    console.log('joined room');
+    console.log('joined room, clients:', clients);
 
     this.shareRoomsInfo();
   };

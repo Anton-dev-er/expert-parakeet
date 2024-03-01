@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { IO } from '../types/webRTC.type';
-import WebRTCController from '../controllers/webRTC.controller';
+import WebRTCController from './contollers/webRTC.controller';
 
 const webRTCHandler = (io: Server<IO>, socket: Socket<IO>) => {
   console.log('\nsocket - connected, socket:', socket.id);

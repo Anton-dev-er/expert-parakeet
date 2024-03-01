@@ -1,7 +1,10 @@
 .room {
-
+  position: relative;
+  height: 100vh;
 }
 
-.localParticipant {
-
+.participants {
+  position: absolute;
+  left: 0;
+  bottom: 0;
 }

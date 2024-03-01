@@ -28,6 +28,11 @@ type HandleOffer = {
   offer: RTCSessionDescriptionInit;
 };
 
+type HandleIceCandidate = {
+  peerId: string;
+  iceCandidate: RTCIceCandidateInit;
+};
+
 export default function useWebRTC(
   roomName: string,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
@@ -38,6 +43,12 @@ export default function useWebRTC(
   // todo get rid of useRef
   const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
+
+
+  // todo polite should be first participant, re check it
+  let makingOffer = false;
+  let ignoreOffer = false;
+  const polite = true;
 
   const addNewClient = (newClient: string, stream: MediaStream | null) => {
     if (newClient) {
@@ -120,19 +131,26 @@ export default function useWebRTC(
 
     let offerHandled = false;
     peerConnection.onnegotiationneeded = async (event) => {
-      console.log('onnegotiationneeded, creating offer, event:', event);
-      if (socket && (createOffer || offerHandled)) {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        console.log('send offer');
-        socket.emit(ACTIONS.SEND_OFFER, {
-          peerId,
-          offer,
-        });
-      } else {
-        console.log('offerHandled');
-        offerHandled = true;
+      try {
+        makingOffer = true;
+        if (socket && (createOffer || offerHandled)) {
+          const offer = await peerConnection.createOffer();
+          await peerConnection.setLocalDescription(offer);
+          console.log('send offer');
+          socket.emit(ACTIONS.SEND_OFFER, {
+            peerId,
+            offer,
+          });
+        } else {
+          console.log('offerHandled');
+          offerHandled = true;
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        makingOffer = false;
       }
+      console.log('onnegotiationneeded, creating offer, event:', event);
     };
     if (localStream && peerConnection) {
       addStreamToConnection(localStream, peerConnection);
@@ -155,17 +173,37 @@ export default function useWebRTC(
   };
 
   const handleOffer = async ({ peerId, offer }: HandleOffer) => {
-    console.log('accepting offer', offer.type);
-    await setRemoteMedia({ peerId, sessionDescription: offer });
+    try {
+      console.log('accepting offer', offer.type);
+      const peerConnection = peerConnections.current[peerId];
+      if (!offer || !peerConnection || !socket) {
+        console.log('handleOffer aborted');
+        return;
+      }
 
-    const peerConnection = peerConnections.current[peerId];
-    console.log('creating answer, peerId:', peerId);
-    if (peerConnection && socket) {
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
+      const offerCollision =
+        offer.type === 'offer' && (makingOffer || peerConnection.signalingState !== 'stable');
 
-      socket.emit(ACTIONS.SEND_ANSWER, { peerId, answer });
-      console.log('send answer');
+      ignoreOffer = !polite && offerCollision;
+      if (ignoreOffer) {
+        console.warn('offer will be ignored');
+        return;
+      }
+
+      await setRemoteMedia({ peerId, sessionDescription: offer });
+
+      if (offer.type === 'offer') {
+        console.log('creating answer, peerId:', peerId);
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        socket.emit(ACTIONS.SEND_ANSWER, { peerId, answer });
+        console.log('send answer');
+      } else {
+        console.warn('offer not valid');
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -199,6 +237,19 @@ export default function useWebRTC(
     }
   };
 
+  const handleIceCandidate = ({ peerId, iceCandidate }: HandleIceCandidate) => {
+    try {
+      console.log('received ICE_CANDIDATE');
+      const peerConnection = peerConnections.current[peerId];
+      void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate));
+    } catch (err) {
+      console.log("handleIceCandidate, ignoreOffer:", ignoreOffer );
+      if (!ignoreOffer) {
+        throw err;
+      }
+    }
+  };
+
   const handleStart = async () => {
     console.log('use effect, handleStart', socket?.id);
     if (socket) {
@@ -206,15 +257,12 @@ export default function useWebRTC(
       socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
       socket.on(ACTIONS.OFFER, handleOffer);
       socket.on(ACTIONS.ANSWER, handleAnswer);
-      socket.on(ACTIONS.ICE_CANDIDATE, ({ peerId, iceCandidate }) => {
-        console.log('received ICE_CANDIDATE');
-        const peerConnection = peerConnections.current[peerId];
-        void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate));
-      });
+      socket.on(ACTIONS.ICE_CANDIDATE, handleIceCandidate);
 
       const localStream = await getUserMedia(true, false);
       localMediaStream.current = localStream;
       addNewClient(LOCAL_CLIENT, localStream);
+      console.log("emit join");
       socket.emit(ACTIONS.JOIN, { room: roomName });
     }
   };
