@@ -27,8 +27,7 @@ const useYoutube = () => {
       return newLink;
     }
 
-
-    return "https://www.youtube.com/embed/";
+    return 'https://www.youtube.com';
   };
 
   useEffect(() => {
@@ -38,7 +37,7 @@ const useYoutube = () => {
     return () => {
       socket?.off(ACTIONS.RELAY_YOUTUBE);
     };
-  }, []);
+  }, [socket]);
 
   return {
     link: validateLink(link),
