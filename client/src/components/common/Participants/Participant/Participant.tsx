@@ -13,7 +13,7 @@ interface Props {
 }
 
 const Participant: FC<Props> = ({ clientMedia }) => {
-  console.warn('Participant re rendering, clientMedia:', clientMedia.client);
+  console.warn('Participant re rendering, clientMedia:', clientMedia?.client);
   const handleVideo = ({ video, stream, client }: HandleVideo) => {
     if (video) {
       video.srcObject = stream;
@@ -29,7 +29,7 @@ const Participant: FC<Props> = ({ clientMedia }) => {
     <div className={styles.participant}>
       <video
         ref={(video) =>
-          handleVideo({ video, client: clientMedia.client, stream: clientMedia.stream })
+          handleVideo({ video, client: clientMedia?.client, stream: clientMedia?.stream })
         }
       />
     </div>

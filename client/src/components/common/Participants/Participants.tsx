@@ -9,11 +9,13 @@ interface Props {
 }
 
 const Participants: FC<Props> = ({ clientsMedia, localMedia }) => {
+
+  clientsMedia = clientsMedia || [];
   return (
     <div className={styles.participants}>
-      <Participant clientMedia={localMedia} key={localMedia.stream?.id} />
+      <Participant clientMedia={localMedia} key={localMedia?.stream?.id} />
       {clientsMedia.map((clientMedia) => {
-        return <Participant key={clientMedia.stream?.id || clientMedia.client} clientMedia={clientMedia} />;
+        return <Participant key={clientMedia.stream?.id || clientMedia?.client} clientMedia={clientMedia} />;
       })}
     </div>
   );
