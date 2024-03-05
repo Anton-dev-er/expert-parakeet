@@ -12,7 +12,9 @@ import getAppDataSource from './src/data-source';
 
 dotenv.config();
 
-const { CLIENT_URL, CLIENT_URL_LOCAL } = process.env;
+const { CLIENT_URL, CLIENT_URL_LOCAL, NODE_ENV } = process.env;
+
+console.log("NODE_ENV:", NODE_ENV);
 
 const allowedOrigin = [CLIENT_URL, CLIENT_URL_LOCAL];
 

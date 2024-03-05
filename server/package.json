@@ -6,7 +6,7 @@
     "node": "16.0.0"
   },
   "scripts": {
-    "dev": "nodemon index.ts & set ENV=dev",
+    "dev": "set NODE_ENV=development && nodemon index.ts",
     "start": "node ./build/index.js",
     "deploy": "npx tsc & gcloud app deploy",
     "typeorm": "typeorm-ts-node-commonjs",

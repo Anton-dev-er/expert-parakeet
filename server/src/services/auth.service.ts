@@ -4,16 +4,30 @@ import tokenService from './token.service';
 import ApiError from '../errors/api.error';
 import userLoginService from './user-login.service';
 import UserDto from '../dtos/user.dto';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // todo good to refactor, some methods to emphasize in user service
 class AuthService {
   MAX_TOKEN_LIFE = 30 * 24 * 60 * 60 * 1000;
 
   async saveRefreshToken(res: Response, userId: string, refreshToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      maxAge: this.MAX_TOKEN_LIFE,
-      httpOnly: true,
-    });
+    const isDev = process.env.NODE_ENV.includes('development');
+    if (isDev) {
+      res.cookie('refreshToken', refreshToken, {
+        maxAge: this.MAX_TOKEN_LIFE,
+        httpOnly: true,
+      });
+    } else {
+      res.cookie('refreshToken', refreshToken, {
+        maxAge: this.MAX_TOKEN_LIFE,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      });
+    }
+
     await tokenService.saveToken(userId, refreshToken);
   }
 
