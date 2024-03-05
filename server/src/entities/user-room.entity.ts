@@ -24,8 +24,8 @@ export default class UserRoomEntity {
   @JoinColumn({ name: 'room_id' })
   room: RoomEntity;
 
-  @Column({ default: false })
-  is_owner: boolean;
+  @Column({ name: 'is_owner', default: false })
+  isOwner: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

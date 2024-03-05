@@ -1,4 +1,4 @@
-  import 'reflect-metadata';
+import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import UserEntity from './entities/user.entity';
 import dotenv from 'dotenv';
@@ -7,13 +7,15 @@ import UserRoleEntity from './entities/user-role.entity';
 import UserLoginEntity from './entities/user-login.entity';
 import RoomEntity from './entities/room.entity';
 import UserRoomEntity from './entities/user-room.entity';
+import UserFriendEntity from './entities/user-friend.entity';
+import RoomHistoryEntity from './entities/room-history.entity';
 import { AuthTypes, Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector';
 
 dotenv.config();
 const { TYPEORM_HOST, TYPEORM_USERNAME, TYPEORM_PASSWORD } = process.env;
 
-let dataSource = null;
-const connect = async () => {
+let dataSource: null | DataSource = null;
+const connect = async (): Promise<DataSource> => {
   // to not initialize it every time, cause google sql cloud kinda slow
   if (dataSource) {
     return dataSource;
@@ -33,7 +35,16 @@ const connect = async () => {
     extra: clientOpts,
     synchronize: true,
     logging: false,
-    entities: [UserEntity, RoleEntity, UserRoleEntity, UserLoginEntity, RoomEntity, UserRoomEntity],
+    entities: [
+      UserEntity,
+      RoleEntity,
+      UserRoleEntity,
+      UserLoginEntity,
+      RoomEntity,
+      UserRoomEntity,
+      UserFriendEntity,
+      RoomHistoryEntity,
+    ],
     migrations: [__dirname + '/migration/*.ts'],
     subscribers: [],
   });

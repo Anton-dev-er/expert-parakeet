@@ -4,9 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
-import UserRoleEntity from './user-role.entity';
 
 @Entity({ name: 'role' })
 export default class RoleEntity {

@@ -7,6 +7,11 @@ class UserService {
     return AppDataSource.getRepository(UserEntity);
   }
 
+  async getAll(): Promise<UserEntity[] | null> {
+    const repo = await this.getRepo();
+    return await repo.find();
+  }
+
   async create(email: string) {
     const repo = await this.getRepo();
     const userEntity = new UserEntity();

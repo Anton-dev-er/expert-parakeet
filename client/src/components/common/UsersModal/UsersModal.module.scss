@@ -1,0 +1,16 @@
+@import '@/src/styles/variables.module';
+
+
+.addFriend {
+  background-color: $bright-red;
+  color: $white;
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+  border-radius: 50%;
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  cursor: pointer;
+}

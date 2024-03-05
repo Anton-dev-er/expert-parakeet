@@ -3,10 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  UpdateDateColumn, OneToMany,
 } from 'typeorm';
-import UserRoomEntity from './user-room.entity';
+import RoomHistoryEntity from './room-history.entity';
 
 @Entity({ name: 'room' })
 export default class RoomEntity {
@@ -19,8 +18,11 @@ export default class RoomEntity {
   @Column({ nullable: false })
   route: string;
 
-  @Column({ default: false })
-  is_private: boolean;
+  @Column({ name: 'is_private', default: false })
+  isPrivate: boolean;
+
+  @OneToMany(() => RoomHistoryEntity, (roomHistory) => roomHistory.user)
+  roomHistory: RoomHistoryEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

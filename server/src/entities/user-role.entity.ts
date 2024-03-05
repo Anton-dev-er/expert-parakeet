@@ -1,12 +1,10 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
-  ManyToOne,
 } from 'typeorm';
 import UserEntity from './user.entity';
 import RoleEntity from './role.entity';

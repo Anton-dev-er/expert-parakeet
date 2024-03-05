@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import { IO } from './src/types/webRTC.type';
 import dotenv from 'dotenv';
 import http from 'http';
+import getAppDataSource from './src/data-source';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ io.on('connection', (socket) => {
 
 const letsGo = async () => {
   try {
+    await getAppDataSource();
     server.listen(PORT, () => console.log(`localhost:${PORT}`));
   } catch (e) {
     console.log(e);

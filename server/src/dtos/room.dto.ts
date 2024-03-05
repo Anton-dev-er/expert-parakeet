@@ -17,11 +17,11 @@ export default class RoomDto {
     this.id = userRoom.id;
     this.name = userRoom.room.name;
     this.route = userRoom.room.route;
-    this.isPrivate = userRoom.room.is_private;
+    this.isPrivate = userRoom.room.isPrivate;
     this.user = {
       id: userRoom.user.id,
       name: userRoom.user.name,
-      isOwner: userRoom.is_owner,
+      isOwner: userRoom.isOwner,
     };
   }
 }

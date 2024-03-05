@@ -21,7 +21,7 @@ class UserRoomService {
     const userRoomEntity = new UserRoomEntity();
     userRoomEntity.user = user;
     userRoomEntity.room = room;
-    userRoomEntity.is_owner = isOwner;
+    userRoomEntity.isOwner = isOwner;
     await repo.save(userRoomEntity);
 
     return userRoomEntity;
@@ -61,7 +61,7 @@ class UserRoomService {
 
     // only public
     return await repo.find({
-      where: { room: { is_private: false } },
+      where: { room: { isPrivate: false } },
       relations: { room: true, user: true },
     });
   }

@@ -33,7 +33,7 @@ const CreateRoomModal = () => {
     const roomRoute = formatRoomName(roomName);
     const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true);
     if (room) {
-      push(roomHref(roomRoute, room.id));
+      push(roomHref(room));
     }
   };
 

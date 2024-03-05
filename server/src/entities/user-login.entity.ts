@@ -24,13 +24,13 @@ export default class UserLoginEntity {
   @Column({ nullable: false })
   password: string;
 
-  @Column({ nullable: false })
+  @Column({ name: 'is_activated', default : false })
   isActivated: boolean;
 
-  @Column({ nullable: false })
+  @Column({ name: 'activation_link', default: null })
   activationLink: string;
 
-  @Column({ default: null })
+  @Column({ name: 'refresh_token', default: null })
   refreshToken: string;
 
   @CreateDateColumn()

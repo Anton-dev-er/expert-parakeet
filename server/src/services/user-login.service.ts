@@ -9,8 +9,29 @@ class UserLoginService {
     return AppDataSource.getRepository(UserLoginEntity);
   }
 
+  async getAll(): Promise<UserLoginEntity[] | null> {
+    const repo = await this.getRepo();
+    return await repo.find({
+      relations: { user: true },
+    });
+  }
+
+  async getByUser(user: UserEntity): Promise<UserLoginEntity | null> {
+    const repo = await this.getRepo();
+    return await repo.findOne({
+      where: { user },
+    });
+  }
+
+  async getByUserId(userId: string): Promise<UserLoginEntity | null> {
+    const repo = await this.getRepo();
+    return await repo.findOne({
+      where: { user: { id: userId } },
+    });
+  }
+
   async create(email: string, password: string, user: UserEntity) {
-    const repo = await this.getRepo()
+    const repo = await this.getRepo();
 
     const userLoginEntity = new UserLoginEntity();
     const hashPassword = tokenService.encryptPassword(password);

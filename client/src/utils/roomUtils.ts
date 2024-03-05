@@ -1,5 +1,7 @@
-const roomHref = (roomUrl: string, userRoomId: string) => {
-  return `/room/${roomUrl}/${userRoomId}`;
+import { RoomResponse } from '@/src/types/response/RoomResponse';
+
+const roomHref = (room: RoomResponse) => {
+  return `/room/${room.route}/${room.id}`;
 };
 
 const isValidRoomName = (str: string) => {

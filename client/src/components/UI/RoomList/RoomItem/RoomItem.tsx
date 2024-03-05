@@ -13,7 +13,7 @@ const RoomItem: FC<Props> = ({ room }) => {
   const { push } = useRouter();
 
   return (
-    <div className={styles.roomItem} onClick={() => push(roomHref(room.route, room.id))}>
+    <div className={styles.roomItem} onClick={() => push(roomHref(room))}>
       <Card>
         <p>User owner: {room.user.name}</p>
         <p>Room name: {room.name}</p>

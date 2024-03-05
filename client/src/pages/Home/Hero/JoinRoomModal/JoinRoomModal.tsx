@@ -24,7 +24,7 @@ const JoinRoomModal = () => {
         return {
           content: room.name,
           id: room.id,
-          handleOnClick: () => push(roomHref(room.route, room.id)),
+          handleOnClick: () => push(roomHref(room)),
         };
       });
   };

@@ -37,7 +37,7 @@ class WebRTCController {
     }
 
     const clients = this.helper.getClientsByRoomId(userRoomId);
-    if (!userRoom.is_owner && clients.length === 0) {
+    if (!userRoom.isOwner && clients.length === 0) {
       console.log('user is not owner', userRoomId);
       return;
     }
