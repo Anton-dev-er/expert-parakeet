@@ -7,10 +7,13 @@ import useAuthContext from '@/src/hooks/useAuthContext';
 import { User } from '@/src/types';
 import { Item } from '@/src/components/UI/List/types';
 import FriendService from '@/src/services/FriendService';
+import Loader from '../../UI/Loader/Loader';
+import useLoader from '@/src/hooks/useLoader';
 
 const UsersModal = () => {
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const { isLoading, setIsLoading } = useLoader();
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -30,7 +33,9 @@ const UsersModal = () => {
   };
 
   const onSelectUser = async (friend: User) => {
+    setIsLoading(true);
     await FriendService.createInvite(user?.id as string, friend.id);
+    setIsLoading(false);
     handleOnClose();
   };
 
@@ -57,6 +62,7 @@ const UsersModal = () => {
       >
         <List items={prepareUsers()} />
       </Modal>
+      {isLoading && <Loader />}
     </div>
   );
 };

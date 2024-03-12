@@ -1,9 +1,11 @@
+@import '@/src/styles/variables.module';
+
 .loader {
   border: none;
   border-radius: 50%;
   width: 4.5rem;
   height: 4.5rem;
-  color: blue;
+  color: $dark-red;
   background: transparent;
   overflow: hidden;
   position: absolute;
@@ -13,10 +15,10 @@
 }
 
 .loader:indeterminate {
-  -webkit-mask-image: linear-gradient(transparent 50%, black 50%),
-    linear-gradient(to right, transparent 50%, black 50%);
-  mask-image: linear-gradient(transparent 50%, black 50%),
-    linear-gradient(to right, transparent 50%, black 50%);
+  -webkit-mask-image: linear-gradient(transparent 50%, $black 50%),
+    linear-gradient(to right, transparent 50%, $black 50%);
+  mask-image: linear-gradient(transparent 50%, $black 50%),
+    linear-gradient(to right, transparent 50%, $black 50%);
   animation: loader-progress-circular 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
 }
 

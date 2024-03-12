@@ -4,6 +4,8 @@ import Modal from '@/src/components/UI/Modal/Modal';
 import Input from '@/src/components/UI/Input/Input';
 import Button from '@/src/components/UI/Button/Button';
 import useAuthContext from '@/src/hooks/useAuthContext';
+import Loader from '../../UI/Loader/Loader';
+import useLoader from '@/src/hooks/useLoader';
 
 // todo remove this component
 const LoginModal = () => {
@@ -12,6 +14,7 @@ const LoginModal = () => {
   const [password, setPassword] = useState('');
   const [switchToRegister, setSwitchToRegister] = useState(false);
   const { login, registration } = useAuthContext();
+  const { isLoading, setIsLoading } = useLoader();
 
   const handleOnOpen = () => {
     setOpen(true);
@@ -22,11 +25,13 @@ const LoginModal = () => {
   };
 
   const handleLogin = async () => {
+    setIsLoading(true);
     if (switchToRegister) {
       await registration(email, password);
     } else {
       await login(email, password);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -59,6 +64,7 @@ const LoginModal = () => {
           </Button>
         </div>
       </Modal>
+      {isLoading && <Loader />}
     </div>
   );
 };
