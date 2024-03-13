@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import styles from './Sidebar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,15 +11,14 @@ import useAuthContext from '@/src/hooks/useAuthContext';
 import { useRouter } from 'next/navigation';
 import { Item } from '@/src/components/UI/List/types';
 import useCheckMobileScreen from '@/src/hooks/useCheckMobileScreen';
-import Loader from '../../UI/Loader/Loader';
-import useLoader from '@/src/hooks/useLoader';
+import useLoaderContext from '@/src/hooks/useLoaderContext';
 
 const Sidebar = () => {
   const { logout, auth } = useAuthContext();
   const { push } = useRouter();
   const [list, setList] = useState<Item[]>([]);
   const [mobileList, setMobileList] = useState<Item[]>([]);
-  const { isLoading, setIsLoading } = useLoader();
+  const { setLoader } = useLoaderContext();
 
   const isMobile = useCheckMobileScreen();
 
@@ -66,12 +66,12 @@ const Sidebar = () => {
   }, [isMobile]);
 
   const handleLogout = async () => {
-    setIsLoading(true);
+    setLoader(true);
     if (auth) {
       await logout();
-      setIsLoading(false);
+      setLoader(false);
     }
-    setIsLoading(false);
+    setLoader(false);
   };
   // todo, list handled very bad, need to come up with smth
   return (
@@ -89,7 +89,6 @@ const Sidebar = () => {
           <FontAwesomeIcon fixedWidth={true} icon={faSignOut} onClick={handleLogout} />
         </div>
       </div>
-      {isLoading && <Loader />}
     </div>
   );
 };
