@@ -44,7 +44,6 @@ export default function useWebRTC(
   const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
 
-
   // todo polite should be first participant, re check it
   let makingOffer = false;
   let ignoreOffer = false;
@@ -243,7 +242,7 @@ export default function useWebRTC(
       const peerConnection = peerConnections.current[peerId];
       void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate));
     } catch (err) {
-      console.log("handleIceCandidate, ignoreOffer:", ignoreOffer );
+      console.log('handleIceCandidate, ignoreOffer:', ignoreOffer);
       if (!ignoreOffer) {
         throw err;
       }
@@ -262,7 +261,7 @@ export default function useWebRTC(
       const localStream = await getUserMedia(true, false);
       localMediaStream.current = localStream;
       addNewClient(LOCAL_CLIENT, localStream);
-      console.log("emit join");
+      console.log('emit join');
       socket.emit(ACTIONS.JOIN, { room: roomName });
     }
   };
