@@ -7,14 +7,17 @@ import {
   faVideoSlash,
   faMicrophoneSlash,
   faMicrophone,
+  faXmark,
+  faDesktop,
 } from '@fortawesome/free-solid-svg-icons';
 import useRoomContext from '@/src/hooks/useRoomContext';
 import { getAudioTrack, getVideoTrack } from '@/src/utils/mediaUtils';
 
 const RoomSidebar = () => {
-  const { localClientMedia, switchAudioOrVideo } = useRoomContext();
+  const { localClientMedia, switchAudioOrVideo, shareScreen, stopScreenShare } = useRoomContext();
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [screenShareEnabled, setScreenShareEnabled] = useState(false);
 
   const handleVideo = () => {
     const track = getVideoTrack(localClientMedia.stream);
@@ -26,6 +29,16 @@ const RoomSidebar = () => {
     }
 
     setVideoEnabled(!videoEnabled);
+  };
+
+  const handleScreenShare = () => {
+    if (!screenShareEnabled) {
+      void shareScreen();
+      setScreenShareEnabled(true);
+    } else {
+      void stopScreenShare();
+      setScreenShareEnabled(false);
+    }
   };
 
   const handleAudio = () => {
@@ -68,6 +81,12 @@ const RoomSidebar = () => {
           size={'2x'}
           icon={videoEnabled ? faVideo : faVideoSlash}
           onClick={handleVideo}
+        />
+        <FontAwesomeIcon
+          fixedWidth={true}
+          size={'2x'}
+          icon={screenShareEnabled ? faXmark : faDesktop}
+          onClick={handleScreenShare}
         />
       </div>
     </div>

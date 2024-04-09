@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Iframe: FC<Props> = ({ src }) => {
-  return <iframe width="640" height="360" className={styles.iframe} src={src}></iframe>;
+  return <iframe width="1060" height="600" className={styles.iframe} src={src}></iframe>;
 };
 
 export default Iframe;

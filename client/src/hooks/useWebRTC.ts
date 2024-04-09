@@ -1,10 +1,10 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 // @ts-expect-error there no @types for freeice
 import freeice from 'freeice';
 import { ACTIONS } from '@/src/contexts/SocketContext';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import { Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { LOCAL_CLIENT, PeerConnection, PeerMediaElement } from '@/src/types/webRTCType';
 import { getUserMedia } from '@/src/utils/mediaUtils';
 
@@ -43,7 +43,6 @@ export default function useWebRTC(
   // todo get rid of useRef
   const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
-
 
   // todo polite should be first participant, re check it
   let makingOffer = false;
@@ -243,7 +242,7 @@ export default function useWebRTC(
       const peerConnection = peerConnections.current[peerId];
       void peerConnection?.addIceCandidate(new RTCIceCandidate(iceCandidate));
     } catch (err) {
-      console.log("handleIceCandidate, ignoreOffer:", ignoreOffer );
+      console.log('handleIceCandidate, ignoreOffer:', ignoreOffer);
       if (!ignoreOffer) {
         throw err;
       }
@@ -262,7 +261,7 @@ export default function useWebRTC(
       const localStream = await getUserMedia(true, false);
       localMediaStream.current = localStream;
       addNewClient(LOCAL_CLIENT, localStream);
-      console.log("emit join");
+      console.log('emit join');
       socket.emit(ACTIONS.JOIN, { room: roomName });
     }
   };
