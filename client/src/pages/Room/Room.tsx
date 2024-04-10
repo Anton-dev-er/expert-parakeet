@@ -8,9 +8,10 @@ import SelectMedia from '@/src/components/common/SelectMedia/SelectMedia';
 import RoomHistoryService from '@/src/services/RoomHistoryService';
 import { useParams } from 'next/navigation';
 import useAuthContext from '@/src/hooks/useAuthContext';
+import { PeerMediaElement, SCREEN_SHARING } from '@/src/types/webRTCType';
 
 const Room = () => {
-  const { localClientMedia, remoteClientsMedia } = useRoomContext();
+  const { localClientMedia, screenSharingStream, remoteClientsMedia } = useRoomContext();
   const { user } = useAuthContext();
   const params = useParams<{ userRoomId: string }>();
 
@@ -20,11 +21,19 @@ const Room = () => {
     }
   }, [user, params]);
 
+  const handleClientMedia = (): PeerMediaElement[] => {
+    if (!screenSharingStream) {
+      return remoteClientsMedia;
+    }
+    return [...remoteClientsMedia, { stream: screenSharingStream, client: SCREEN_SHARING }];
+  };
+
   return (
     <div className={styles.room}>
       <SelectMedia />
+
       <div className={styles.participants}>
-        <Participants clientsMedia={remoteClientsMedia} localMedia={localClientMedia} />
+        <Participants clientsMedia={handleClientMedia()} localMedia={localClientMedia} />
       </div>
     </div>
   );

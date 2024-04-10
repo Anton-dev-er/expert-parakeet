@@ -1,12 +1,12 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // @ts-expect-error there no @types for freeice
 import freeice from 'freeice';
 import { ACTIONS } from '@/src/contexts/SocketContext';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import { Socket, io } from 'socket.io-client';
-import { LOCAL_CLIENT, PeerConnection, PeerMediaElement } from '@/src/types/webRTCType';
-import { getUserMedia } from '@/src/utils/mediaUtils';
+import { Socket } from 'socket.io-client';
+import { LOCAL_CLIENT, PeerConnection, PeerMediaElement, SCREEN_SHARING } from '@/src/types/webRTCType';
+import { getDisplayMedia, getUserMedia } from '@/src/utils/mediaUtils';
 
 type HandleNewPeer = {
   peerId: string;
@@ -26,6 +26,7 @@ type HandleAnswer = {
 type HandleOffer = {
   peerId: string;
   offer: RTCSessionDescriptionInit;
+  streamMetadata: object
 };
 
 type HandleIceCandidate = {
@@ -33,10 +34,16 @@ type HandleIceCandidate = {
   iceCandidate: RTCIceCandidateInit;
 };
 
+let streamMetadata: { [key: string]: string } = {}
+const setStreamMetadata = (newData: object) => {
+  streamMetadata = {...streamMetadata, ...newData}
+}
+
 export default function useWebRTC(
   roomName: string,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
 ) {
+  const [screenSharingStream, setScreenSharingStream] = useState<MediaStream | null>(null);
   const [peerMediaElements, setPeerMediaElements] = useState<PeerMediaElement[]>([]);
   const [sender, setSender] = useState<RTCRtpSender | null>(null);
 
@@ -68,15 +75,50 @@ export default function useWebRTC(
     }
   };
 
+  const removeClient = (client: string) => {
+    setPeerMediaElements((peerMediaElements) => {
+      return peerMediaElements.filter((element) => element.client !== client);
+    });
+  }
+
   const replaceLocalStream = async (audio: boolean, video: boolean) => {
     const newLocalMedia = await getUserMedia(audio, video);
-    console.log('replaceLocalStream, audio:', audio, ', video:', video);
     localMediaStream.current = newLocalMedia;
     addNewClient(LOCAL_CLIENT, newLocalMedia);
     Object.entries(peerConnections.current).forEach(([peerId, connection]) => {
       if (connection && peerId) {
         if (newLocalMedia) {
           addStreamToConnection(newLocalMedia, connection);
+        } else {
+          removeStreamFromConnection(connection);
+        }
+      }
+    });
+  };
+
+  const replaceScreenSharing = async (screenShareEnabled: boolean) => {
+    let newStream: MediaStream | null = null;
+
+    if (screenShareEnabled) {
+      newStream = await getDisplayMedia();
+      if (newStream) {
+        const newMeta: { [key: string]: string } = {}
+        newMeta[newStream.id] = "screen-sharing"
+        setStreamMetadata(newMeta)
+        setScreenSharingStream(newStream);
+      }
+    } else {
+      if (screenSharingStream) {
+        const tracks = screenSharingStream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+      setScreenSharingStream(null);
+    }
+
+    Object.entries(peerConnections.current).forEach(([peerId, connection]) => {
+      if (connection && peerId) {
+        if (newStream) {
+          addStreamToConnection(newStream, connection);
         } else {
           removeStreamFromConnection(connection);
         }
@@ -119,11 +161,22 @@ export default function useWebRTC(
 
     peerConnection.ontrack = ({ streams: [remoteStream] }) => {
       // on track called twice on audio and video
-      console.log('ontrack then addNewClient');
-      addNewClient(peerId, remoteStream);
+      console.log('ontrack then addNewClient, streamMetadata', streamMetadata, remoteStream.id);
+
+      const type = streamMetadata[remoteStream.id];
+      if (type === "screen-sharing") {
+        addNewClient(type, remoteStream);
+      } else {
+        addNewClient(peerId, remoteStream);
+      }
+
       remoteStream.onremovetrack = (event) => {
         console.log('on remove track, event:', event);
-        addNewClient(peerId, null);
+        if (type === "screen-sharing") {
+          removeClient(type);
+        } else {
+          addNewClient(peerId, null);
+        }
       };
     };
     peerConnections.current[peerId] = peerConnection;
@@ -135,10 +188,11 @@ export default function useWebRTC(
         if (socket && (createOffer || offerHandled)) {
           const offer = await peerConnection.createOffer();
           await peerConnection.setLocalDescription(offer);
-          console.log('send offer');
+          console.log('send offer, streamMetadata:', streamMetadata);
           socket.emit(ACTIONS.SEND_OFFER, {
             peerId,
             offer,
+            streamMetadata
           });
         } else {
           console.log('offerHandled');
@@ -161,9 +215,7 @@ export default function useWebRTC(
     peerConnection?.close();
 
     delete peerConnections.current[peerId];
-    setPeerMediaElements((peerMediaElements) => {
-      return peerMediaElements.filter((element) => element.client !== peerId);
-    });
+    removeClient(peerId);
   };
 
   const handleAnswer = async ({ peerId, answer }: HandleAnswer) => {
@@ -171,9 +223,10 @@ export default function useWebRTC(
     await setRemoteMedia({ peerId, sessionDescription: answer });
   };
 
-  const handleOffer = async ({ peerId, offer }: HandleOffer) => {
+  const handleOffer = async ({ peerId, offer, streamMetadata }: HandleOffer) => {
     try {
-      console.log('accepting offer', offer.type);
+      console.log('accepting offer, streamMetadata:', streamMetadata);
+      setStreamMetadata(streamMetadata)
       const peerConnection = peerConnections.current[peerId];
       if (!offer || !peerConnection || !socket) {
         console.log('handleOffer aborted');
@@ -275,5 +328,5 @@ export default function useWebRTC(
     };
   }, [socket, roomName]);
 
-  return { clientsMedia: peerMediaElements, replaceLocalStream };
+  return { clientsMedia: peerMediaElements, screenSharingStream, replaceLocalStream, replaceScreenSharing };
 }
