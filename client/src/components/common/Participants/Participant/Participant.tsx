@@ -37,7 +37,6 @@ const Participant: FC<Props> = ({ clientMedia }) => {
         autoPlay
         playsInline
       />
-      <p>{user?.name}</p>
     </div>
   );
 };

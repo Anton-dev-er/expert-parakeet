@@ -1,22 +1,13 @@
 'use client';
-import React, {
-  createContext,
-  FC,
-  MouseEventHandler,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, FC, ReactNode, useEffect, useState } from 'react';
 import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
 
 interface RoomContextType {
   localClientMedia: PeerMediaElement;
   remoteClientsMedia: PeerMediaElement[];
+  screenSharingStream: MediaStream | null;
   switchAudioOrVideo: (audio: boolean, video: boolean) => Promise<void>;
-  shareScreen: () => void;
-  stopScreenShare: () => void;
-  videoRef: React.MutableRefObject<undefined>;
+  replaceScreenSharing: (screenShareEnabled: boolean) => Promise<void>;
 }
 
 export const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -24,13 +15,20 @@ export const RoomContext = createContext<RoomContextType>({} as RoomContextType)
 export const RoomContextProvider: FC<{
   children: ReactNode;
   clientsMedia: PeerMediaElement[];
+  screenSharingStream: MediaStream | null;
   replaceLocalStream: (audio: boolean, video: boolean) => Promise<void>;
-}> = ({ children, clientsMedia, replaceLocalStream }) => {
+  replaceScreenSharing: (screenShareEnabled: boolean) => Promise<void>;
+}> = ({
+  children,
+  clientsMedia,
+  screenSharingStream,
+  replaceLocalStream,
+  replaceScreenSharing,
+}) => {
   const [localClientMedia, setLocalClientMedia] = useState<PeerMediaElement>(
     {} as PeerMediaElement
   );
   const [remoteClientsMedia, setRemoteClientsMedia] = useState<PeerMediaElement[]>([]);
-  const videoRef = useRef();
 
   useEffect(() => {
     populateContext(clientsMedia);
@@ -53,32 +51,14 @@ export const RoomContextProvider: FC<{
     await replaceLocalStream(audio, video);
   };
 
-  const shareScreen = async () => {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-      audio: true,
-      video: {
-        cursor: 'always',
-      },
-    });
-    videoRef.current.srcObject = stream;
-  };
-
-  const stopScreenShare = () => {
-    let tracks = videoRef.current.srcObject.getTracks();
-    tracks.forEach((t) => t.stop());
-    videoRef.current.srcObject = null;
-    console.log(tracks);
-  };
-
   return (
     <RoomContext.Provider
       value={{
         localClientMedia,
         remoteClientsMedia,
-        shareScreen,
-        stopScreenShare,
         switchAudioOrVideo,
-        videoRef,
+        replaceScreenSharing,
+        screenSharingStream,
       }}
     >
       {children}

@@ -1,12 +1,12 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // @ts-expect-error there no @types for freeice
 import freeice from 'freeice';
 import { ACTIONS } from '@/src/contexts/SocketContext';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
-import { Socket, io } from 'socket.io-client';
-import { LOCAL_CLIENT, PeerConnection, PeerMediaElement } from '@/src/types/webRTCType';
-import { getUserMedia } from '@/src/utils/mediaUtils';
+import { Socket } from 'socket.io-client';
+import { LOCAL_CLIENT, PeerConnection, PeerMediaElement, SCREEN_SHARING } from '@/src/types/webRTCType';
+import { getDisplayMedia, getUserMedia } from '@/src/utils/mediaUtils';
 
 type HandleNewPeer = {
   peerId: string;
@@ -43,6 +43,7 @@ export default function useWebRTC(
   // todo get rid of useRef
   const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
+  const [screenSharingStream, setScreenSharingStream] = useState<MediaStream | null>(null);
 
   // todo polite should be first participant, re check it
   let makingOffer = false;
@@ -68,15 +69,45 @@ export default function useWebRTC(
     }
   };
 
+  const removeClient = (client: string) => {
+    setPeerMediaElements((peerMediaElements) => {
+      return peerMediaElements.filter((element) => element.client !== client);
+    });
+  }
+
   const replaceLocalStream = async (audio: boolean, video: boolean) => {
     const newLocalMedia = await getUserMedia(audio, video);
-    console.log('replaceLocalStream, audio:', audio, ', video:', video);
     localMediaStream.current = newLocalMedia;
     addNewClient(LOCAL_CLIENT, newLocalMedia);
     Object.entries(peerConnections.current).forEach(([peerId, connection]) => {
       if (connection && peerId) {
         if (newLocalMedia) {
           addStreamToConnection(newLocalMedia, connection);
+        } else {
+          removeStreamFromConnection(connection);
+        }
+      }
+    });
+  };
+
+  const replaceScreenSharing = async (screenShareEnabled: boolean) => {
+    let newStream: MediaStream | null = null;
+
+    if (screenShareEnabled) {
+      newStream = await getDisplayMedia();
+      setScreenSharingStream(newStream);
+    } else {
+      if (screenSharingStream) {
+        const tracks = screenSharingStream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+      setScreenSharingStream(null);
+    }
+
+    Object.entries(peerConnections.current).forEach(([peerId, connection]) => {
+      if (connection && peerId) {
+        if (newStream) {
+          addStreamToConnection(newStream, connection);
         } else {
           removeStreamFromConnection(connection);
         }
@@ -161,9 +192,7 @@ export default function useWebRTC(
     peerConnection?.close();
 
     delete peerConnections.current[peerId];
-    setPeerMediaElements((peerMediaElements) => {
-      return peerMediaElements.filter((element) => element.client !== peerId);
-    });
+    removeClient(peerId);
   };
 
   const handleAnswer = async ({ peerId, answer }: HandleAnswer) => {
@@ -275,5 +304,5 @@ export default function useWebRTC(
     };
   }, [socket, roomName]);
 
-  return { clientsMedia: peerMediaElements, replaceLocalStream };
+  return { clientsMedia: peerMediaElements, screenSharingStream, replaceLocalStream, replaceScreenSharing };
 }

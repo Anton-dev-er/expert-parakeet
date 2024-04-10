@@ -3,18 +3,19 @@ import React, { useEffect, useState } from 'react';
 import styles from './RoomSidebar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faDesktop,
+  faMicrophone,
+  faMicrophoneSlash,
   faVideo,
   faVideoSlash,
-  faMicrophoneSlash,
-  faMicrophone,
   faXmark,
-  faDesktop,
 } from '@fortawesome/free-solid-svg-icons';
 import useRoomContext from '@/src/hooks/useRoomContext';
 import { getAudioTrack, getVideoTrack } from '@/src/utils/mediaUtils';
 
 const RoomSidebar = () => {
-  const { localClientMedia, switchAudioOrVideo, shareScreen, stopScreenShare } = useRoomContext();
+  const { localClientMedia, switchAudioOrVideo, replaceScreenSharing, screenSharingStream } =
+    useRoomContext();
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [screenShareEnabled, setScreenShareEnabled] = useState(false);
@@ -31,16 +32,6 @@ const RoomSidebar = () => {
     setVideoEnabled(!videoEnabled);
   };
 
-  const handleScreenShare = () => {
-    if (!screenShareEnabled) {
-      void shareScreen();
-      setScreenShareEnabled(true);
-    } else {
-      void stopScreenShare();
-      setScreenShareEnabled(false);
-    }
-  };
-
   const handleAudio = () => {
     const track = getAudioTrack(localClientMedia.stream);
     if (track && audioEnabled) {
@@ -50,6 +41,11 @@ const RoomSidebar = () => {
       void switchAudioOrVideo(true, videoEnabled);
     }
     setAudioEnabled(!audioEnabled);
+  };
+
+  const handleScreenShare = () => {
+    void replaceScreenSharing(!screenShareEnabled);
+    setScreenShareEnabled(!screenShareEnabled);
   };
 
   useEffect(() => {
@@ -66,6 +62,17 @@ const RoomSidebar = () => {
       });
     }
   }, [localClientMedia.stream]);
+
+  useEffect(() => {
+    const handleOnEnded = () => {
+      setScreenShareEnabled(false);
+      void replaceScreenSharing(false);
+    };
+    const track = screenSharingStream?.getVideoTracks()[0];
+
+    track && track.addEventListener('ended', handleOnEnded);
+    return () => track && track.removeEventListener('ended', handleOnEnded);
+  }, [screenSharingStream]);
 
   return (
     <div className={styles.roomSidebar}>
