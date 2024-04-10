@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import styles from './Sidebar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,12 +11,14 @@ import useAuthContext from '@/src/hooks/useAuthContext';
 import { useRouter } from 'next/navigation';
 import { Item } from '@/src/components/UI/List/types';
 import useCheckMobileScreen from '@/src/hooks/useCheckMobileScreen';
+import useLoaderContext from '@/src/hooks/useLoaderContext';
 
 const Sidebar = () => {
   const { logout, auth } = useAuthContext();
   const { push } = useRouter();
   const [list, setList] = useState<Item[]>([]);
   const [mobileList, setMobileList] = useState<Item[]>([]);
+  const { setLoader } = useLoaderContext();
 
   const isMobile = useCheckMobileScreen();
 
@@ -63,9 +66,12 @@ const Sidebar = () => {
   }, [isMobile]);
 
   const handleLogout = async () => {
+    setLoader(true);
     if (auth) {
       await logout();
+      setLoader(false);
     }
+    setLoader(false);
   };
   // todo, list handled very bad, need to come up with smth
   return (

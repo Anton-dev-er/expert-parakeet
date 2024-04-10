@@ -7,10 +7,12 @@ import { useRouter } from 'next/navigation';
 import useAuthContext from '@/src/hooks/useAuthContext';
 import RoomService from '@/src/services/RoomService';
 import { roomHref, isValidRoomName } from '@/src/utils/roomUtils';
+import useLoaderContext from '@/src/hooks/useLoaderContext';
 
 const CreateRoomModal = () => {
   const [open, setOpen] = useState(false);
   const [roomName, setRoomName] = useState('');
+  const { setLoader } = useLoaderContext();
   const { push } = useRouter();
   const { auth, user } = useAuthContext();
 
@@ -27,14 +29,18 @@ const CreateRoomModal = () => {
   };
 
   const handleCreateRoom = async () => {
+    setLoader(true);
     if (!roomName || !auth || !user) {
+      setLoader(false);
       return;
     }
     const roomRoute = formatRoomName(roomName);
     const room = await RoomService.createRoom(user.id, roomName, roomRoute, false, true);
+
     if (room) {
       push(roomHref(room));
     }
+    setLoader(false);
   };
 
   return (
