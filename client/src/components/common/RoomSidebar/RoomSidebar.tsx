@@ -3,18 +3,22 @@ import React, { useEffect, useState } from 'react';
 import styles from './RoomSidebar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faDesktop,
+  faMicrophone,
+  faMicrophoneSlash,
   faVideo,
   faVideoSlash,
-  faMicrophoneSlash,
-  faMicrophone,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import useRoomContext from '@/src/hooks/useRoomContext';
 import { getAudioTrack, getVideoTrack } from '@/src/utils/mediaUtils';
 
 const RoomSidebar = () => {
-  const { localClientMedia, switchAudioOrVideo } = useRoomContext();
+  const { localClientMedia, switchAudioOrVideo, replaceScreenSharing, screenSharingStream } =
+    useRoomContext();
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [screenShareEnabled, setScreenShareEnabled] = useState(false);
 
   const handleVideo = () => {
     const track = getVideoTrack(localClientMedia.stream);
@@ -39,6 +43,11 @@ const RoomSidebar = () => {
     setAudioEnabled(!audioEnabled);
   };
 
+  const handleScreenShare = () => {
+    void replaceScreenSharing(!screenShareEnabled);
+    setScreenShareEnabled(!screenShareEnabled);
+  };
+
   useEffect(() => {
     if (localClientMedia.stream) {
       const tracks = localClientMedia.stream.getTracks();
@@ -54,6 +63,17 @@ const RoomSidebar = () => {
     }
   }, [localClientMedia.stream]);
 
+  useEffect(() => {
+    const handleOnEnded = () => {
+      setScreenShareEnabled(false);
+      void replaceScreenSharing(false);
+    };
+    const track = screenSharingStream?.getVideoTracks()[0];
+
+    track && track.addEventListener('ended', handleOnEnded);
+    return () => track && track.removeEventListener('ended', handleOnEnded);
+  }, [screenSharingStream]);
+
   return (
     <div className={styles.roomSidebar}>
       <div className={styles.options}>
@@ -68,6 +88,12 @@ const RoomSidebar = () => {
           size={'2x'}
           icon={videoEnabled ? faVideo : faVideoSlash}
           onClick={handleVideo}
+        />
+        <FontAwesomeIcon
+          fixedWidth={true}
+          size={'2x'}
+          icon={screenShareEnabled ? faXmark : faDesktop}
+          onClick={handleScreenShare}
         />
       </div>
     </div>

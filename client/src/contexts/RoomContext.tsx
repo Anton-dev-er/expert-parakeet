@@ -5,7 +5,9 @@ import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
 interface RoomContextType {
   localClientMedia: PeerMediaElement;
   remoteClientsMedia: PeerMediaElement[];
+  screenSharingStream: MediaStream | null;
   switchAudioOrVideo: (audio: boolean, video: boolean) => Promise<void>;
+  replaceScreenSharing: (screenShareEnabled: boolean) => Promise<void>;
 }
 
 export const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -13,8 +15,16 @@ export const RoomContext = createContext<RoomContextType>({} as RoomContextType)
 export const RoomContextProvider: FC<{
   children: ReactNode;
   clientsMedia: PeerMediaElement[];
+  screenSharingStream: MediaStream | null;
   replaceLocalStream: (audio: boolean, video: boolean) => Promise<void>;
-}> = ({ children, clientsMedia, replaceLocalStream }) => {
+  replaceScreenSharing: (screenShareEnabled: boolean) => Promise<void>;
+}> = ({
+  children,
+  clientsMedia,
+  screenSharingStream,
+  replaceLocalStream,
+  replaceScreenSharing,
+}) => {
   const [localClientMedia, setLocalClientMedia] = useState<PeerMediaElement>(
     {} as PeerMediaElement
   );
@@ -47,6 +57,8 @@ export const RoomContextProvider: FC<{
         localClientMedia,
         remoteClientsMedia,
         switchAudioOrVideo,
+        replaceScreenSharing,
+        screenSharingStream,
       }}
     >
       {children}

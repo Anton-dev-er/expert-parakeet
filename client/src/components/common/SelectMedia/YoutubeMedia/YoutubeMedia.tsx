@@ -8,10 +8,9 @@ import useYoutube from '@/src/hooks/useYoutube';
 
 const YoutubeMedia = () => {
   const [show, setShow] = useState(false);
-  const {setLink, link } = useYoutube();
-
+  const { setLink, link } = useYoutube();
   useEffect(() => {
-    if (link && link !== 'https://www.youtube.com/embed/') {
+    if (link && link !== 'https://www.youtube.com/embed/' && link !== 'https://www.youtube.com/') {
       setShow(true);
     }
   }, [link]);

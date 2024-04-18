@@ -90,10 +90,19 @@ class WebRTCController {
     this.shareRoomsInfo();
   };
 
-  sendOffer = ({ peerId, offer }: { peerId: string; offer: RTCSessionDescriptionInit }) => {
+  sendOffer = ({
+    peerId,
+    offer,
+    streamMetadata,
+  }: {
+    peerId: string;
+    offer: RTCSessionDescriptionInit;
+    streamMetadata: { [key: string]: string };
+  }) => {
     this.io.to(peerId).emit('OFFER', {
       peerId: this.socket.id,
       offer,
+      streamMetadata,
     });
   };
 

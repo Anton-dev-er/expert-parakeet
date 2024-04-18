@@ -27,7 +27,7 @@ const useYoutube = () => {
       return newLink;
     }
 
-    return 'https://www.youtube.com';
+    return 'https://www.youtube.com/';
   };
 
   useEffect(() => {
