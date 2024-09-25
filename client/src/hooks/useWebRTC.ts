@@ -166,7 +166,7 @@ export default function useWebRTC(
 
       const type = streamMetadata[remoteStream.id];
       if (type === "screen-sharing") {
-        addNewClient(type, remoteStream);
+        addNewClient(SCREEN_SHARING, remoteStream);
       } else {
         addNewClient(peerId, remoteStream);
       }

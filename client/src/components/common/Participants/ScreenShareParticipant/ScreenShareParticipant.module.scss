@@ -1,0 +1,18 @@
+.screenShareParticipant {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  div {
+    border-radius: .2em;
+    background-color: unset;
+    margin: 1em;
+    width: 640px;
+    height: 360px;
+  }
+
+  video {
+    border-radius: .2em;
+    object-fit: contain;
+  }
+}
