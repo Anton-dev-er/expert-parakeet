@@ -22,7 +22,7 @@ const getVideoTrack = (media: MediaStream | null): MediaStreamTrack | null => {
   return track.length ? track[0] : null;
 };
 
-const getUserMedia = async (audio: boolean, video: boolean) => {
+const getUserMedia = async (audio: boolean, video: boolean | object) => {
   try {
     return await navigator.mediaDevices.getUserMedia({
       audio: audio,
@@ -31,8 +31,14 @@ const getUserMedia = async (audio: boolean, video: boolean) => {
   } catch {
     return null;
   }
-
 };
 
+const getDisplayMedia = async () => {
+  try {
+    return await navigator.mediaDevices.getDisplayMedia();
+  } catch {
+    return null;
+  }
+};
 
-export { getAudioTrack, getVideoTrack, getUserMedia };
+export { getAudioTrack, getVideoTrack, getUserMedia, getDisplayMedia };

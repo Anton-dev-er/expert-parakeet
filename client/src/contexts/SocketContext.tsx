@@ -39,6 +39,7 @@ export const SocketContextProvider: FC<{ children: ReactNode }> = ({ children })
       console.log('new connection');
       setSocket(connection);
     }
+
     return () => {
       socket?.disconnect();
     };
