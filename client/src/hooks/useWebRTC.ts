@@ -26,6 +26,7 @@ type HandleAnswer = {
 type HandleOffer = {
   peerId: string;
   offer: RTCSessionDescriptionInit;
+  streamMetadata: object
 };
 
 type HandleIceCandidate = {
@@ -33,10 +34,16 @@ type HandleIceCandidate = {
   iceCandidate: RTCIceCandidateInit;
 };
 
+let streamMetadata: { [key: string]: string } = {}
+const setStreamMetadata = (newData: object) => {
+  streamMetadata = {...streamMetadata, ...newData}
+}
+
 export default function useWebRTC(
   roomName: string,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
 ) {
+  const [screenSharingStream, setScreenSharingStream] = useState<MediaStream | null>(null);
   const [peerMediaElements, setPeerMediaElements] = useState<PeerMediaElement[]>([]);
   const [sender, setSender] = useState<RTCRtpSender | null>(null);
 
@@ -95,7 +102,12 @@ export default function useWebRTC(
 
     if (screenShareEnabled) {
       newStream = await getDisplayMedia();
-      setScreenSharingStream(newStream);
+      if (newStream) {
+        const newMeta: { [key: string]: string } = {}
+        newMeta[newStream.id] = "screen-sharing"
+        setStreamMetadata(newMeta)
+        setScreenSharingStream(newStream);
+      }
     } else {
       if (screenSharingStream) {
         const tracks = screenSharingStream.getTracks();
@@ -150,11 +162,22 @@ export default function useWebRTC(
 
     peerConnection.ontrack = ({ streams: [remoteStream] }) => {
       // on track called twice on audio and video
-      console.log('ontrack then addNewClient');
-      addNewClient(peerId, remoteStream);
+      console.log('ontrack then addNewClient, streamMetadata', streamMetadata, remoteStream.id);
+
+      const type = streamMetadata[remoteStream.id];
+      if (type === "screen-sharing") {
+        addNewClient(SCREEN_SHARING, remoteStream);
+      } else {
+        addNewClient(peerId, remoteStream);
+      }
+
       remoteStream.onremovetrack = (event) => {
         console.log('on remove track, event:', event);
-        addNewClient(peerId, null);
+        if (type === "screen-sharing") {
+          removeClient(type);
+        } else {
+          addNewClient(peerId, null);
+        }
       };
     };
     peerConnections.current[peerId] = peerConnection;
@@ -166,10 +189,11 @@ export default function useWebRTC(
         if (socket && (createOffer || offerHandled)) {
           const offer = await peerConnection.createOffer();
           await peerConnection.setLocalDescription(offer);
-          console.log('send offer');
+          console.log('send offer, streamMetadata:', streamMetadata);
           socket.emit(ACTIONS.SEND_OFFER, {
             peerId,
             offer,
+            streamMetadata
           });
         } else {
           console.log('offerHandled');
@@ -200,9 +224,10 @@ export default function useWebRTC(
     await setRemoteMedia({ peerId, sessionDescription: answer });
   };
 
-  const handleOffer = async ({ peerId, offer }: HandleOffer) => {
+  const handleOffer = async ({ peerId, offer, streamMetadata }: HandleOffer) => {
     try {
-      console.log('accepting offer', offer.type);
+      console.log('accepting offer, streamMetadata:', streamMetadata);
+      setStreamMetadata(streamMetadata)
       const peerConnection = peerConnections.current[peerId];
       if (!offer || !peerConnection || !socket) {
         console.log('handleOffer aborted');
