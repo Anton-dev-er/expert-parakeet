@@ -50,7 +50,6 @@ export default function useWebRTC(
   // todo get rid of useRef
   const peerConnections = useRef<PeerConnection>({});
   const localMediaStream = useRef<MediaStream | null>(null);
-  const [screenSharingStream, setScreenSharingStream] = useState<MediaStream | null>(null);
 
   // todo polite should be first participant, re check it
   let makingOffer = false;
@@ -78,6 +77,7 @@ export default function useWebRTC(
 
   const removeClient = (client: string) => {
     setPeerMediaElements((peerMediaElements) => {
+      console.log(client, peerMediaElements);
       return peerMediaElements.filter((element) => element.client !== client);
     });
   }
@@ -174,7 +174,7 @@ export default function useWebRTC(
       remoteStream.onremovetrack = (event) => {
         console.log('on remove track, event:', event);
         if (type === "screen-sharing") {
-          removeClient(type);
+          removeClient(SCREEN_SHARING);
         } else {
           addNewClient(peerId, null);
         }

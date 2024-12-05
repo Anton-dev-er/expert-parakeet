@@ -9,49 +9,29 @@ import RoomEntity from './entities/room.entity';
 import UserRoomEntity from './entities/user-room.entity';
 import UserFriendEntity from './entities/user-friend.entity';
 import RoomHistoryEntity from './entities/room-history.entity';
-import { AuthTypes, Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector';
 
 dotenv.config();
-const { TYPEORM_HOST, TYPEORM_USERNAME, TYPEORM_PASSWORD } = process.env;
+const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 
-let dataSource: null | DataSource = null;
-const connect = async (): Promise<DataSource> => {
-  // to not initialize it every time, cause google sql cloud kinda slow
-  if (dataSource) {
-    return dataSource;
-  }
-  const connector = new Connector();
-  const clientOpts = await connector.getOptions({
-    instanceConnectionName: TYPEORM_HOST,
-    authType: 'IAM' as AuthTypes,
-    ipType: 'PUBLIC' as IpAddressTypes,
-  });
-
+const connect = async () => {
   // todo check if updatedAt updating
-  dataSource = new DataSource({
+  const AppDataSource = new DataSource({
     type: 'postgres',
-    username: TYPEORM_USERNAME,
-    password: TYPEORM_PASSWORD,
-    extra: clientOpts,
+    host: DB_HOST,
+    port: parseInt(DB_PORT || '5432'),
+    username: DB_USERNAME,
+    password: DB_PASSWORD,
+    database: DB_DATABASE,
+
     synchronize: true,
     logging: false,
-    entities: [
-      UserEntity,
-      RoleEntity,
-      UserRoleEntity,
-      UserLoginEntity,
-      RoomEntity,
-      UserRoomEntity,
-      UserFriendEntity,
-      RoomHistoryEntity,
-    ],
+    entities: [UserEntity, RoleEntity, UserRoleEntity, UserLoginEntity, RoomEntity, UserRoomEntity, UserFriendEntity, RoomHistoryEntity],
     migrations: [__dirname + '/migration/*.ts'],
     subscribers: [],
   });
 
-  await dataSource.initialize();
-
-  return dataSource;
-};
+  await AppDataSource.initialize()
+  return AppDataSource;
+}
 
 export default connect;

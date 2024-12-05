@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import styles from './Participant.module.scss';
 import { LOCAL_CLIENT, PeerMediaElement } from '@/src/types/webRTCType';
-import useAuthContext from '@/src/hooks/useAuthContext';
 
 type HandleVideo = {
   video: HTMLVideoElement | null;
@@ -14,7 +13,6 @@ interface Props {
 }
 
 const Participant: FC<Props> = ({ clientMedia }) => {
-  const { user } = useAuthContext();
   console.warn('Participant re rendering, clientMedia:', clientMedia?.client);
   const handleVideo = ({ video, stream, client }: HandleVideo) => {
     if (video) {
