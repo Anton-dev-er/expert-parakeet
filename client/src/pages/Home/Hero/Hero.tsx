@@ -9,8 +9,8 @@ const Hero = () => {
     <div className={styles.hero}>
       <h1>Hang out with your friends</h1>
       <div>
-        {/*<JoinRoomModal />*/}
-        {/*<CreateRoomModal />*/}
+        <JoinRoomModal />
+        <CreateRoomModal />
       </div>
     </div>
   );

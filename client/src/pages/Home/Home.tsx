@@ -5,7 +5,7 @@ import { ACTIONS } from '@/src/contexts/SocketContext';
 import useSocketContext from '@/src/hooks/useSocketContext';
 import Hero from '@/src/pages/Home/Hero/Hero';
 import { RoomResponse } from '@/src/types/response/RoomResponse';
-import RoomList from '@/src/components/UI/RoomList/RoomList';
+import PublicRooms from '@/src/pages/Home/PublicRooms/PublicRooms';
 
 const Home = () => {
   const [rooms, setRooms] = useState<RoomResponse[]>([]);
@@ -27,12 +27,7 @@ const Home = () => {
   return (
     <div className={styles.home}>
       <Hero />
-
-      {/*todo separate in component*/}
-      <div className={styles.home}>
-        <h2>Global public rooms</h2>
-        {rooms.length ? <RoomList rooms={rooms} /> : <h3>Rooms not found</h3>}
-      </div>
+      <PublicRooms rooms={rooms}/>
     </div>
   );
 };
